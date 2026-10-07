@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /resource/
+Disallow: /portfolio-website/
+
+Sitemap: https://rupak-biswas.com/sitemap.xml
