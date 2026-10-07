@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Rupak Biswas - Senior Designer | Enterprise UX Leader & AI Systems Orchestrator">
+    <meta name="keywords" content="Rupak Biswas, Enterprise UX, Design Executive, Vibe Coding, Systems over screens, B2B FinTech, Design Systems, CUA">
+    <meta name="robots" content="noarchive, noimageindex">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <title>Rupak Biswas | Interactive Portfolio v2.0 — AI UX Orchestrator</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="theme-and-guide.css?v=2.3.0">
+    <link rel="stylesheet" href="astronomical-city.css?v=2.2.0">
+    <script>
+        if (sessionStorage.getItem('rupak_astro_loader_seen') && !location.search.includes('intro') && !location.search.includes('replay') && !location.search.includes('city') && !location.search.includes('preset')) {
+            document.documentElement.classList.add('skip-loader-instant');
+        }
+    </script>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#EEE9FF',
+                            100: '#E4DCFF',
+                            200: '#C9B8FF',
+                            400: '#A394FF',
+                            500: '#8B75FF',
+                            600: '#6D4AFF',
+                            700: '#5935E8',
+                            cyan: '#6D4AFF', /* Maintained alias mapped to Electric Violet */
+                            accent: '#8B75FF',
+                        },
+                        dark: {
+                            950: '#0D0D0F',
+                            900: '#0D0D0F',
+                            800: '#151518',
+                            700: '#1C1C21',
+                            600: '#222228',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 3s infinite alternate',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 15px rgba(109, 74, 255, 0.2)' },
+                            '100%': { boxShadow: '0 0 35px rgba(109, 74, 255, 0.6)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ==========================================================================
+           CUSTOM CSS & DESIGN SYSTEM TOKENS
+           Fully synchronized with ux-designer-portfolio-color-palette.md via theme-and-guide.css
+           ========================================================================== */
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: none; /* Custom interactive cursor enabled */
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor-dot, #cursor-glow { display: none !important; }
+        }
+
+        /* Dual-Layer Interactive Cursor Base */
+        #cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--primary-brand);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.15s ease, height 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 0 10px var(--primary-brand);
+        }
+
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1px solid var(--primary-brand);
+            background: rgba(109, 74, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+        }
+
+        body.cursor-hover #cursor-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-hover);
+        }
+
+        body.cursor-hover #cursor-glow {
+            width: 56px;
+            height: 56px;
+            border-color: var(--primary-brand);
+            background-color: rgba(109, 74, 255, 0.1);
+        }
+
+        /* Editorial Solid Title - No Gradients */
+        .text-gradient {
+            color: var(--primary-brand) !important;
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+        }
+
+        .text-neon {
+            color: var(--primary-brand);
+        }
+
+        /* Reveal on scroll */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .typing-cursor::after {
+            content: '█';
+            animation: blink 1s infinite;
+            color: var(--primary-brand);
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="selection:bg-brand-cyan selection:text-black">
+
+    <!-- Custom Interactive Dual Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-glow"></div>
+
+    <!-- Ambient Glowing Background Lights -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute -top-40 left-1/4 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[140px] animate-pulse-slow"></div>
+        <div class="absolute top-1/3 -right-40 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[160px]"></div>
+        <div class="absolute bottom-10 left-10 w-[600px] h-[600px] bg-violet-950/10 rounded-full blur-[180px]"></div>
+    </div>
+
+    <!-- ==========================================================================
+       INTELLIGENT NAVIGATION BAR
+       ========================================================================== -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/10 text-xs tracking-wide">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Brand & Status -->
+            <a href="#" class="flex items-center gap-3 group interactive">
+                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/15 flex items-center justify-center font-mono font-bold text-white group-hover:border-brand-cyan transition-colors">
+                    RB
+                </div>
+                <div>
+                    <span class="font-bold text-sm tracking-wider text-white uppercase block leading-none">Rupak Biswas</span>
+                    <span class="text-[10px] text-gray-400 font-mono tracking-normal block mt-1">
+                        MUMBAI / GLOBAL
+                    </span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <div class="hidden lg:flex items-center gap-6 xl:gap-8 font-medium text-gray-300">
+                <button type="button" onclick="openGuidePopover(event)" class="hover:text-brand-cyan transition-colors interactive flex items-center gap-1.5 text-xs font-medium text-gray-300">
+                    <i data-lucide="bot" class="w-3.5 h-3.5 text-brand-cyan"></i> Ask Guide & Explore
+                </button>
+                <a href="#work" class="hover:text-brand-cyan transition-colors interactive flex items-center gap-1.5">
+                    <i data-lucide="layers" class="w-3.5 h-3.5"></i> Book of Work
+                </a>
+                <a href="#philosophy" class="hover:text-brand-cyan transition-colors interactive flex items-center gap-1.5">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Philosophy
+                </a>
+                <a href="#leadership" class="hover:text-brand-cyan transition-colors interactive flex items-center gap-1.5">
+                    <i data-lucide="award" class="w-3.5 h-3.5"></i> Leadership
+                </a>
+            </div>
+
+            <!-- Primary CTA Button & Theme Toggle -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" class="hidden sm:flex w-9 h-9 rounded-full bg-white/5 border border-white/10 items-center justify-center text-gray-300 hover:text-white hover:border-brand-cyan transition-all interactive" title="Toggle Light / Dark Mode">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-400"></i>
+                </button>
+                <a href="mailto:rbiswas5888@gmail.com" class="relative group interactive hidden md:inline-flex items-center justify-center px-4 md:px-5 py-2 text-xs font-semibold rounded-full overflow-hidden transition-all duration-300 bg-white text-black hover:bg-brand-cyan hover:text-white hover:shadow-[0_0_20px_rgba(109,74,255,0.4)]">
+                    <span class="relative z-10 flex items-center gap-2 font-mono uppercase tracking-wider">
+                        Initiate Protocol <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                    </span>
+                </a>
+                <!-- Mobile / Tablet Hamburger Toggle Button -->
+                <button type="button" onclick="toggleMobileMenu()" id="mobile-menu-btn" class="flex lg:hidden w-9 h-9 rounded-lg bg-white/5 border border-white/10 items-center justify-center text-gray-300 hover:text-white hover:border-brand-cyan transition-all interactive" aria-label="Toggle Navigation Menu">
+                    <i data-lucide="menu" id="mobile-menu-icon" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile & Tablet Slide-Out Navigation Drawer -->
+        <div id="mobile-nav-drawer" class="mobile-nav-drawer fixed top-16 left-0 right-0 p-5 space-y-4 shadow-2xl transition-all duration-300 transform -translate-y-full opacity-0 pointer-events-none lg:hidden z-40 border-b">
+            <!-- Dark Mode Section in Hamburger -->
+            <div class="pb-3 border-b border-white/10">
+                <button type="button" onclick="toggleTheme();" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-mono transition-all interactive mobile-action-btn">
+                    <i data-lucide="moon" id="mobile-theme-icon" class="w-4 h-4 text-slate-300"></i>
+                    <span id="mobile-theme-label">Dark Mode</span>
+                </button>
+            </div>
+
+            <!-- Mobile Links -->
+            <div class="space-y-1.5 text-sm font-medium">
+                <button type="button" onclick="toggleMobileMenu(); openGuidePopover(event);" class="w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between text-xs font-mono mobile-nav-link">
+                    <span>Ask Guide & Explore</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </button>
+                <a href="#work" onclick="toggleMobileMenu();" class="block px-3 py-2 rounded-xl transition-all text-xs font-mono mobile-nav-link">
+                    Book of Work
+                </a>
+                <a href="#philosophy" onclick="toggleMobileMenu();" class="block px-3 py-2 rounded-xl transition-all text-xs font-mono mobile-nav-link">
+                    Philosophy
+                </a>
+                <a href="#leadership" onclick="toggleMobileMenu();" class="block px-3 py-2 rounded-xl transition-all text-xs font-mono mobile-nav-link">
+                    Leadership
+                </a>
+                <a href="mailto:rbiswas5888@gmail.com" class="block mt-2 px-4 py-2.5 text-center text-xs font-mono uppercase font-bold tracking-wider rounded-xl bg-brand-cyan text-white hover:bg-[#5935E8] transition-all shadow-md">
+                    Initiate Protocol &rarr;
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+    <main class="relative z-10 pt-24">
+
+        <!-- ----------------------------------------------------------------------
+           HERO SECTION: AI CONVERSATIONAL OPERATING SYSTEM
+           ---------------------------------------------------------------------- -->
+        <section id="hero-chat" class="min-h-[85vh] flex flex-col justify-center items-center px-4 py-12">
+            <div class="max-w-4xl w-full mx-auto text-center mb-8">
+                <!-- Tagline Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-gray-300 mb-6 backdrop-blur-md reveal-on-scroll">
+                    <i data-lucide="terminal" class="w-3.5 h-3.5 text-brand-cyan"></i>
+                    <span>ENTERPRISE UX ORCHESTRATION ENGINE v2.0</span>
+                </div>
+
+                <!-- Main Headline -->
+                <h1 class="text-4xl md:text-7xl font-extrabold tracking-tight leading-none mb-6 reveal-on-scroll">
+                    Systems over screens.<br>
+                    <span class="text-gradient">Impact over aesthetics.</span>
+                </h1>
+
+                <!-- Subhead -->
+                <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed mb-8 reveal-on-scroll">
+                    Senior Designer architecting enterprise platforms, mitigating risk, and automating design-to-code pipelines for global institutions.
+                </p>
+            </div>
+
+                <!-- Hero Action Cluster (Clean & Executive) -->
+                <div class="flex flex-wrap items-center justify-center gap-3 mb-8 reveal-on-scroll">
+                    <button type="button" onclick="openGuidePopover(event)" class="group interactive inline-flex items-center justify-center px-6 py-3 rounded-full bg-brand-cyan hover:bg-[#5935E8] text-white text-xs font-mono font-bold tracking-wide transition-all duration-300 shadow-lg shadow-brand-cyan/25 hover:shadow-brand-cyan/40 hover:scale-105">
+                        <span>Ask Guide & Explore</span>
+                    </button>
+                    <a href="#work" class="interactive inline-flex items-center justify-center px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono transition-all duration-300 hover:border-brand-cyan/50">
+                        <span>Explore Blueprints</span>
+                    </a>
+                </div>
+
+                <!-- Quick Discovery Prompt Pills -->
+                <div class="flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto reveal-on-scroll">
+                    <span class="text-[11px] font-mono text-gray-400 mr-1">
+                        Ask directly:
+                    </span>
+                    <button type="button" onclick="openGuidePopover(event, 'who-is-rupak')" class="glass-chip px-3 py-1.5 rounded-full text-xs font-mono text-gray-300 hover:text-white hover:border-brand-cyan/40 interactive transition-all">
+                        Who is Rupak?
+                    </button>
+                    <button type="button" onclick="openGuidePopover(event, 'corporate-banking')" class="glass-chip px-3 py-1.5 rounded-full text-xs font-mono text-gray-300 hover:text-white hover:border-brand-cyan/40 interactive transition-all">
+                        Corporate Banking
+                    </button>
+                    <button type="button" onclick="openGuidePopover(event, 'oil-gas')" class="glass-chip px-3 py-1.5 rounded-full text-xs font-mono text-gray-300 hover:text-white hover:border-brand-cyan/40 interactive transition-all">
+                        Energy OS
+                    </button>
+                    <button type="button" onclick="openGuidePopover(event, 'tata-pay')" class="glass-chip px-3 py-1.5 rounded-full text-xs font-mono text-gray-300 hover:text-white hover:border-brand-cyan/40 interactive transition-all">
+                        Tata Pay UPI
+                    </button>
+                    <button type="button" onclick="openGuidePopover(event, 'systems-over-screens')" class="glass-chip px-3 py-1.5 rounded-full text-xs font-mono text-gray-300 hover:text-white hover:border-brand-cyan/40 interactive transition-all">
+                        Systems Over Screens
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ----------------------------------------------------------------------
+           THE BOOK OF WORK: ENTERPRISE CASE STUDIES GRID
+           ---------------------------------------------------------------------- -->
+        <section id="work" class="py-24 px-6 bg-white/[0.02] border-t border-white/10 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 reveal-on-scroll">
+                    <div>
+                        <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// PORTFOLIO</span>
+                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">The Book of Work.</h2>
+                        <p class="text-gray-400 mt-2 text-sm">Enterprise case studies across high-concurrency and heavily regulated domains.</p>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="flex flex-wrap gap-2 mt-6 md:mt-0" id="filter-tabs">
+                        <button onclick="filterProjects('all')" class="tab-btn glass-chip active px-4 py-1.5 rounded-full text-xs font-medium text-white interactive">All</button>
+                        <button onclick="filterProjects('fintech')" class="tab-btn glass-chip px-4 py-1.5 rounded-full text-xs font-medium text-gray-300 interactive">FinTech</button>
+                        <button onclick="filterProjects('energy')" class="tab-btn glass-chip px-4 py-1.5 rounded-full text-xs font-medium text-gray-300 interactive">Energy OS</button>
+                        <button onclick="filterProjects('saas')" class="tab-btn glass-chip px-4 py-1.5 rounded-full text-xs font-medium text-gray-300 interactive">SaaS & DB</button>
+                    </div>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid">
+
+                    <!-- Project 1: Corporate Digital Banking (Featured Full-width) -->
+                    <div class="project-card fintech glass-card rounded-3xl overflow-hidden group md:col-span-2 flex flex-col md:flex-row reveal-on-scroll">
+                        <div class="p-8 md:p-12 md:w-1/2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-4">
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-brand-cyan text-[11px] font-mono font-medium">B2B FinTech</span>
+                                        <span class="px-2.5 py-1 rounded-md bg-white/5 text-gray-300 text-[11px] font-mono">Modernized Architecture</span>
+                                    </div>
+                                    <button onclick="openModal('banking')" class="text-[11px] font-mono text-gray-400 hover:text-brand-cyan px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 transition-colors interactive">
+                                        Quick Preview
+                                    </button>
+                                </div>
+                                <a href="case-study-corporate-banking.html" class="block group/title interactive">
+                                    <h3 class="text-2xl md:text-3xl font-bold text-white mb-3 group-hover/title:text-brand-cyan transition-colors">Corporate Digital Banking</h3>
+                                </a>
+                                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                    Overhauled legacy tech debt to launch a modern corporate banking experience for tier-1 financial clients. Streamlined high-value treasury workflows and compliance controls.
+                                </p>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-6 py-4 border-t border-white/10 mb-6 text-xs font-mono text-gray-300">
+                                    <div><span class="text-gray-500 block">IMPACT</span> <strong class="text-white text-sm">$100B+ Treasury Flow</strong></div>
+                                    <div><span class="text-gray-500 block">ROLE</span> <strong class="text-white text-sm">Lead UX Strategist</strong></div>
+                                </div>
+                                <a href="case-study-corporate-banking.html" class="inline-flex items-center text-xs font-semibold text-brand-cyan hover:text-cyan-300 group-hover:translate-x-2 transition-all interactive">
+                                    Explore Architecture Blueprint <i data-lucide="arrow-right" class="w-4 h-4 ml-1.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <a href="case-study-corporate-banking.html" class="md:w-1/2 bg-black/60 relative overflow-hidden min-h-[280px] block interactive">
+                            <img src="resource/images/Bank.png" alt="Corporate Banking" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" onerror="this.src='https://images.unsplash.com/photo-1501167783395-523ef21012f3?auto=format&fit=crop&w=1200&q=80'">
+                        </a>
+                    </div>
+
+                    <!-- Project 2: ExxonMobil / Deloitte Oil & Gas -->
+                    <div class="project-card energy glass-card rounded-3xl overflow-hidden group flex flex-col reveal-on-scroll">
+                        <a href="case-study-oil-gas.html" class="bg-black/60 h-48 relative overflow-hidden block interactive">
+                            <img src="resource/images/oil-gas/hero_1.png" alt="Oil and Gas" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" onerror="this.src='https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80&w=800'">
+                        </a>
+                        <div class="p-8 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <span class="px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] font-mono">ExxonMobil / Deloitte</span>
+                                    <button onclick="openModal('oilgas')" class="text-[10px] font-mono text-gray-400 hover:text-brand-cyan px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition-colors interactive">
+                                        Preview
+                                    </button>
+                                </div>
+                                <a href="case-study-oil-gas.html" class="block group/title interactive">
+                                    <h3 class="text-xl font-bold text-white mb-2 group-hover/title:text-brand-cyan transition-colors">Oil & Gas: Global OS</h3>
+                                </a>
+                                <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                                    Digital order management platform backed by a complex rules-engine, deployed across 100+ countries and 25 languages.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+                                <span class="text-gray-400">100+ Countries</span>
+                                <a href="case-study-oil-gas.html" class="text-brand-cyan hover:text-cyan-300 flex items-center gap-1 interactive font-semibold">
+                                    Full Study <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 3: Tata Pay -->
+                    <div class="project-card fintech glass-card rounded-3xl overflow-hidden group flex flex-col reveal-on-scroll">
+                        <a href="case-study-tata-pay.html" class="bg-black/60 h-48 relative overflow-hidden block interactive">
+                            <img src="resource/images/TataPay.png" alt="Tata Pay" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" onerror="this.src='https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80'">
+                        </a>
+                        <div class="p-8 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono">FinTech Integration</span>
+                                    <button onclick="openModal('tatapay')" class="text-[10px] font-mono text-gray-400 hover:text-brand-cyan px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition-colors interactive">
+                                        Preview
+                                    </button>
+                                </div>
+                                <a href="case-study-tata-pay.html" class="block group/title interactive">
+                                    <h3 class="text-xl font-bold text-white mb-2 group-hover/title:text-brand-cyan transition-colors">Tata Pay Ecosystem</h3>
+                                </a>
+                                <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                                    Integrated enterprise payment flows balancing transactional security with consumer UX simplicity, achieving +40% adoption.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+                                <span class="text-gray-400">+40% Adoption</span>
+                                <a href="case-study-tata-pay.html" class="text-brand-cyan hover:text-cyan-300 flex items-center gap-1 interactive font-semibold">
+                                    Full Study <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 4: Capella App Services -->
+                    <div class="project-card saas glass-card rounded-3xl overflow-hidden group flex flex-col reveal-on-scroll">
+                        <a href="case-study-couchbase-app-services.html" class="bg-black/60 h-48 relative overflow-hidden block interactive">
+                            <img src="resource/images/App_Service.png" alt="Capella App Services" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" onerror="this.src='https://images.unsplash.com/photo-1618761714954-0b8cd0026356?auto=format&fit=crop&w=800&q=80'">
+                        </a>
+                        <div class="p-8 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <span class="px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-brand-cyan text-[11px] font-mono">Enterprise SaaS</span>
+                                    <button onclick="openModal('appservice')" class="text-[10px] font-mono text-gray-400 hover:text-brand-cyan px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition-colors interactive">
+                                        Preview
+                                    </button>
+                                </div>
+                                <a href="case-study-couchbase-app-services.html" class="block group/title interactive">
+                                    <h3 class="text-xl font-bold text-white mb-2 group-hover/title:text-brand-cyan transition-colors">Capella App Services</h3>
+                                </a>
+                                <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                                    Zero-server offline-first backend synchronization. Accelerated developer onboarding from weeks to minutes.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+                                <span class="text-gray-400">Weeks&rarr;Minutes TTI</span>
+                                <a href="case-study-couchbase-app-services.html" class="text-brand-cyan hover:text-cyan-300 flex items-center gap-1 interactive font-semibold">
+                                    Full Study <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 5: Couchbase Day 0 -->
+                    <div class="project-card saas glass-card rounded-3xl overflow-hidden group flex flex-col reveal-on-scroll">
+                        <a href="case-study-couchbase-day-0.html" class="bg-black/60 h-48 relative overflow-hidden block interactive">
+                            <img src="resource/images/Capella_Day_0/Day_0-02.png" alt="Couchbase" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80'">
+                        </a>
+                        <div class="p-8 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <span class="px-2.5 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[11px] font-mono">Database Infra</span>
+                                    <button onclick="openModal('couchbase')" class="text-[10px] font-mono text-gray-400 hover:text-brand-cyan px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition-colors interactive">
+                                        Preview
+                                    </button>
+                                </div>
+                                <a href="case-study-couchbase-day-0.html" class="block group/title interactive">
+                                    <h3 class="text-xl font-bold text-white mb-2 group-hover/title:text-brand-cyan transition-colors">Couchbase Day 0 UX</h3>
+                                </a>
+                                <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                                    Streamlined onboarding architecture for enterprise database administrators, cutting initial setup time by 30%.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+                                <span class="text-gray-400">-26% Support Tickets</span>
+                                <a href="case-study-couchbase-day-0.html" class="text-brand-cyan hover:text-cyan-300 flex items-center gap-1 interactive font-semibold">
+                                    Full Study <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 6: Automotive ERP & WMS -->
+                    <div class="project-card saas glass-card rounded-3xl overflow-hidden group flex flex-col reveal-on-scroll">
+                        <a href="case-study-warehouse-management.html" class="bg-black/60 h-48 relative overflow-hidden block interactive">
+                            <img src="resource/images/Automotive_Warehouse.png" alt="Automotive ERP" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" onerror="this.src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'">
+                        </a>
+                        <div class="p-8 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <span class="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-mono">Logistics & WMS</span>
+                                    <button onclick="openModal('wms')" class="text-[10px] font-mono text-gray-400 hover:text-brand-cyan px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition-colors interactive">
+                                        Preview
+                                    </button>
+                                </div>
+                                <a href="case-study-warehouse-management.html" class="block group/title interactive">
+                                    <h3 class="text-xl font-bold text-white mb-2 group-hover/title:text-brand-cyan transition-colors">Automotive ERP System</h3>
+                                </a>
+                                <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                                    High-concurrency Warehouse Management System bridging legacy AS400 terminals with modern RFID scanning touchpoints.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+                                <span class="text-gray-400">-22% Scan Errors</span>
+                                <a href="case-study-warehouse-management.html" class="text-brand-cyan hover:text-cyan-300 flex items-center gap-1 interactive font-semibold">
+                                    Full Study <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ----------------------------------------------------------------------
+           CORE METHODOLOGY: THE VIBE CODING ENGINE
+           ---------------------------------------------------------------------- -->
+        <section id="philosophy" class="py-24 px-6 border-t border-white/10 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 reveal-on-scroll">
+                    <div>
+                        <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// METHODOLOGY</span>
+                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">
+                            The Engine: <span class="text-gray-500">Vibe Coding</span>
+                        </h2>
+                    </div>
+                    <p class="text-gray-400 max-w-md mt-4 md:mt-0 text-sm leading-relaxed">
+                        Synthesizing design vision and front-end engineering into an unbroken, automated design-to-production pipeline.
+                    </p>
+                </div>
+
+                <!-- 4 Pillar Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Pillar 1 -->
+                    <div class="glass-card p-8 rounded-2xl reveal-on-scroll flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-brand-cyan mb-6">
+                                <i data-lucide="code-2" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Figma to VS Code</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Eliminating handoff friction by tokenizing UI specs and integrating LLM-assisted workflows to compile production-ready component suites instantly.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/5 text-xs font-mono text-brand-cyan">
+                            ✓ ZERO FRICTION HANDOFF
+                        </div>
+                    </div>
+
+                    <!-- Pillar 2 -->
+                    <div class="glass-card p-8 rounded-2xl reveal-on-scroll flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-6">
+                                <i data-lucide="trending-up" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Operational Efficiency</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                At the executive level, UX ROI is measured in engineering hours saved. Accelerating releases by up to 40% while slashing technical debt.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/5 text-xs font-mono text-blue-400">
+                            ✓ 40% FASTER TTM
+                        </div>
+                    </div>
+
+                    <!-- Pillar 3 -->
+                    <div class="glass-card p-8 rounded-2xl reveal-on-scroll flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
+                                <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Governance & Risk</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Architecting systems for strict B2B FinTech compliance, multi-jurisdictional accessibility, and bulletproof transactional security.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/5 text-xs font-mono text-emerald-400">
+                            ✓ TIER-1 COMPLIANCE
+                        </div>
+                    </div>
+
+                    <!-- Pillar 4 -->
+                    <div class="glass-card p-8 rounded-2xl reveal-on-scroll flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-6">
+                                <i data-lucide="globe-2" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Global Scale</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Designing modular design engines configured for 100+ countries, 25 localized languages, and multi-tenant enterprise configurations.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/5 text-xs font-mono text-purple-400">
+                            ✓ 100+ COUNTRIES DEPLOYED
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ----------------------------------------------------------------------
+           EXECUTIVE LEADERSHIP & CREDENTIALS
+           ---------------------------------------------------------------------- -->
+        <section id="leadership" class="py-24 px-6 border-t border-white/10">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+                    
+                    <!-- Bio Overview -->
+                    <div class="lg:col-span-2 reveal-on-scroll">
+                        <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// EXECUTIVE PROFILE</span>
+                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-6">
+                            11+ Years Driving Enterprise Design Transformation.
+                        </h2>
+                        <p class="text-gray-300 leading-relaxed text-base mb-6">
+                            Rupak Biswas is a Certified Usability Analyst (CUA™) and Senior Designer with deep domain expertise in B2B FinTech, Oil & Gas, and SaaS infrastructure.
+                        </p>
+                        <p class="text-gray-400 leading-relaxed text-sm mb-8">
+                            Following a strategic family relocation to Mumbai, Rupak leads cross-functional teams, aligns C-suite stakeholders, and implements automated design-to-code pipelines globally.
+                        </p>
+
+                        <!-- Key Achievements Badges -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 font-mono text-xs">
+                            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                                <span class="text-brand-cyan text-xl font-bold block mb-1">11+ Yrs</span>
+                                <span class="text-gray-400">UX Leadership</span>
+                            </div>
+                            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                                <span class="text-brand-cyan text-xl font-bold block mb-1">CUA™</span>
+                                <span class="text-gray-400">Certified Analyst</span>
+                            </div>
+                            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                                <span class="text-brand-cyan text-xl font-bold block mb-1">100+</span>
+                                <span class="text-gray-400">Global Markets</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resume CTA Card -->
+                    <div class="glass-card p-8 rounded-3xl border border-white/15 text-center reveal-on-scroll">
+                        <div class="relative w-20 h-20 rounded-2xl mx-auto mb-4 p-1 border profile-avatar-frame overflow-hidden">
+                            <img src="Avatar.png" alt="Rupak Biswas - Senior Designer" class="w-full h-full object-contain object-top" onerror="this.onerror=null; this.src='resource/images/Avatar.png';">
+                            <span class="absolute top-1 right-1 w-3 h-3 rounded-full guide-avatar-status-dot border-2 shadow-sm"></span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Executive Dossier</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-5">
+                            Download career highlights, enterprise UX blueprints, and verified CUA™ credentials.
+                        </p>
+                        <a href="resource/images/Resume_Rupak_Biswas.pdf" target="_blank" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-brand-cyan hover:text-white transition-all duration-300 interactive shadow-lg">
+                            Download Resume <i data-lucide="download" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================================================
+       FOOTER & PROTOCOL INITIATION
+       ========================================================================== -->
+    <footer class="py-20 px-6 border-t border-white/10 glass-panel relative z-10">
+        <div class="max-w-4xl mx-auto text-center">
+            <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-4">// PROTOCOL INITIATION</span>
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6">Require strategic UX orchestration?</h2>
+            <p class="text-gray-400 max-w-lg mx-auto text-sm mb-8">
+                Available for executive design leadership, enterprise UX strategy, and global platform transformations.
+            </p>
+            
+            <a href="mailto:rbiswas5888@gmail.com" class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-brand-cyan text-white hover:text-white hover:bg-[#5935E8] font-bold text-sm tracking-wider uppercase hover:shadow-[0_0_30px_rgba(109,74,255,0.5)] transition-all duration-300 interactive mb-12">
+                <i data-lucide="mail" class="w-4 h-4"></i> Initiate Conversation
+            </a>
+
+            <div class="pt-12 border-t border-white/10 text-xs font-mono text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>&copy; <span id="year">2026</span> Rupak Biswas. All rights reserved.</div>
+                <div class="flex items-center gap-4">
+                    <span>CUA™ Usability Analyst</span>
+                    <span>•</span>
+                    <span>Mumbai, MH</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==========================================================================
+       DYNAMIC CASE STUDY BLUEPRINT MODAL
+       ========================================================================== -->
+    <div id="case-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl hidden items-center justify-center p-4 sm:p-6 transition-opacity duration-300">
+        <div class="glass-panel max-w-3xl w-full max-h-[90vh] rounded-3xl border border-white/20 overflow-hidden flex flex-col shadow-2xl relative">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-black/40">
+                <div class="flex items-center gap-2 font-mono text-xs text-brand-cyan">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                    <span id="modal-category">CASE STUDY ARCHITECTURE</span>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white interactive">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6 sm:p-8 overflow-y-auto space-y-6 text-gray-300 text-sm leading-relaxed" id="modal-body">
+                <!-- Dynamically populated via JS -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-white/10 bg-black/40 flex items-center justify-between text-xs font-mono text-gray-400">
+                <span>Rupak Biswas Portfolio v2.0</span>
+                <button onclick="closeModal()" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium interactive">
+                    Close Blueprint
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       INTERACTIVE AVATAR CONCIERGE & PORTFOLIO GUIDE (Dedicated Guide Component)
+       ========================================================================== -->
+    <div id="portfolio-guide-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-auto">
+        
+        <!-- Guide Dialogue / Routing Popover (Unified with RB Chat) -->
+        <div id="guide-popover" onclick="event.stopPropagation()" class="w-[360px] sm:w-[440px] max-w-[calc(100vw-2rem)] max-h-[85vh] sm:max-h-[640px] flex flex-col rounded-3xl border shadow-2xl mb-3 transition-all duration-300 transform origin-bottom-right scale-95 opacity-0 pointer-events-none backdrop-blur-2xl overflow-hidden">
+            <!-- Popover Header -->
+            <div class="flex items-center justify-between p-4 border-b guide-divider shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="guide-headshot-frame w-9 h-9 rounded-full overflow-hidden border shadow-sm shrink-0">
+                        <img src="Avatar-headshot.png" alt="Rupak Avatar" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='resource/images/rupak_avatar_headshot.png';">
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold flex items-center gap-1.5 guide-title">
+                            Rupak Biswas
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </h4>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-[10px] font-mono guide-subtitle">Ask Guide & Explore</span>
+                            <span id="ai-engine-badge" class="text-[9px] font-mono px-1.5 py-0.2 rounded-full border">Portfolio AI</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button type="button" onclick="openGeminiModal()" id="gemini-toggle-btn" class="guide-btn-icon p-1.5 rounded-lg transition-colors interactive" title="Connect Google Gemini API" aria-label="Connect Gemini">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brand-cyan"></i>
+                    </button>
+                    <button type="button" onclick="resetChat()" class="guide-btn-icon p-1.5 rounded-lg transition-colors interactive" title="Reset Conversation" aria-label="Reset Conversation">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" onclick="closeGuidePopover(event)" class="guide-close-btn p-1.5 rounded-lg transition-colors interactive" title="Close Guide" aria-label="Close Guide">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Switcher (Segmented Control) -->
+            <div class="px-4 pt-3 pb-2 flex items-center gap-1 border-b guide-divider shrink-0">
+                <button type="button" id="tab-guide-chat" onclick="switchGuideTab('chat')" class="guide-tab-btn active flex-1 py-1.5 px-2 rounded-xl text-[11px] font-mono font-semibold flex items-center justify-center gap-1.5 transition-all">
+                    <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+                    <span>Ask AI Chat</span>
+                </button>
+                <button type="button" id="tab-guide-routes" onclick="switchGuideTab('routes')" class="guide-tab-btn flex-1 py-1.5 px-2 rounded-xl text-[11px] font-mono font-semibold flex items-center justify-center gap-1.5 transition-all">
+                    <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                    <span>Guide & Routes</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: Chat View -->
+            <div id="view-guide-chat" class="flex flex-col flex-1 min-h-0">
+                <!-- Chat Messages Scroll Container -->
+                <div id="chat-messages" class="p-3.5 overflow-y-auto space-y-3 font-sans text-xs leading-relaxed scroll-smooth flex-1">
+                    <!-- Dynamic messages -->
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typing-indicator" class="px-4 py-1.5 text-[11px] font-mono hidden flex items-center gap-2 border-t guide-divider shrink-0">
+                    <div class="flex items-center gap-1 py-0.5 px-2 rounded-full border guide-bubble-box">
+                        <span class="w-1.5 h-1.5 bg-brand-cyan rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                        <span class="w-1.5 h-1.5 bg-brand-cyan rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                        <span class="w-1.5 h-1.5 bg-brand-cyan rounded-full animate-bounce"></span>
+                    </div>
+                    <span id="typing-status-text" class="text-[10px]">AI is reasoning...</span>
+                </div>
+
+                <!-- Suggested Topic Chips (Horizontal Scrollable) -->
+                <div class="p-2 border-t guide-divider overflow-x-auto no-scrollbar flex gap-1.5 shrink-0">
+                    <button type="button" onclick="handlePromptClick('who-is-rupak')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Who is Rupak?
+                    </button>
+                    <button type="button" onclick="handlePromptClick('ux-design')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        UX Design
+                    </button>
+                    <button type="button" onclick="handlePromptClick('ai-ux-design')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        AI + UX Design
+                    </button>
+                    <button type="button" onclick="handlePromptClick('projects-overview')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Projects in Brief
+                    </button>
+                    <button type="button" onclick="handlePromptClick('corporate-banking')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Corporate Banking
+                    </button>
+                    <button type="button" onclick="handlePromptClick('oil-gas')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Energy OS
+                    </button>
+                    <button type="button" onclick="handlePromptClick('tata-pay')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Tata Pay
+                    </button>
+                    <button type="button" onclick="handlePromptClick('couchbase-day-0')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Couchbase
+                    </button>
+                    <button type="button" onclick="handlePromptClick('systems-over-screens')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Systems over screens
+                    </button>
+                    <button type="button" onclick="handlePromptClick('initiate-protocol')" class="guide-chip px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all interactive">
+                        Contact
+                    </button>
+                </div>
+
+                <!-- Conversational Chat Input Bar -->
+                <form id="chat-form" onsubmit="handleChatSubmit(event)" class="p-2.5 border-t guide-divider flex items-center gap-1.5 shrink-0">
+                    <input type="text" id="chat-input" placeholder="Ask about Rupak's UX leadership & case studies..." autocomplete="off"
+                        class="w-full guide-input rounded-xl px-3 py-2 text-xs font-mono focus:outline-none transition-all">
+                    <button type="submit" id="chat-send-btn" class="guide-send-btn p-2 rounded-xl text-xs font-mono font-bold flex items-center justify-center transition-all interactive shrink-0" title="Send Question">
+                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- TAB 2: Guide & Routes View -->
+            <div id="view-guide-routes" class="hidden p-4 overflow-y-auto space-y-3 flex-1">
+                <!-- Case Study Walkthrough Box (Active if on case study page, or welcome intro on home page) -->
+                <div class="p-3 rounded-2xl border guide-bubble-box">
+                    <p id="guide-speech-bubble" class="text-xs leading-relaxed">
+                        Hello! I'm your visual guide to Rupak's portfolio, powered by Gemini. Where would you like to navigate, or what would you like to explore?
+                    </p>
+                </div>
+                <div id="guide-walkthrough-controls" class="hidden"></div>
+
+                <!-- Fast Navigation Routes Grid -->
+                <div class="space-y-1.5 pt-1">
+                    <span class="text-[9px] font-mono uppercase tracking-wider guide-section-label block px-1">Fast Navigation Routes</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <a href="case-study-corporate-banking.html" class="guide-route-link flex items-center p-2 rounded-xl border transition-all text-[11px] interactive group">
+                            <div class="truncate">
+                                <span class="font-medium block leading-tight truncate">Corporate Banking</span>
+                                <span class="text-[9px] font-mono block guide-route-metric">$100B+ Flow</span>
+                            </div>
+                        </a>
+                        <a href="case-study-oil-gas.html" class="guide-route-link flex items-center p-2 rounded-xl border transition-all text-[11px] interactive group">
+                            <div class="truncate">
+                                <span class="font-medium block leading-tight truncate">Global Energy OS</span>
+                                <span class="text-[9px] font-mono block guide-route-metric">100+ Nations</span>
+                            </div>
+                        </a>
+                        <a href="case-study-tata-pay.html" class="guide-route-link flex items-center p-2 rounded-xl border transition-all text-[11px] interactive group">
+                            <div class="truncate">
+                                <span class="font-medium block leading-tight truncate">Tata Pay UPI</span>
+                                <span class="text-[9px] font-mono block guide-route-metric">+40% Adoption</span>
+                            </div>
+                        </a>
+                        <a href="case-study-couchbase-day-0.html" class="guide-route-link flex items-center p-2 rounded-xl border transition-all text-[11px] interactive group">
+                            <div class="truncate">
+                                <span class="font-medium block leading-tight truncate">Couchbase Day 0</span>
+                                <span class="text-[9px] font-mono block guide-route-metric">TTV &lt; 5 mins</span>
+                            </div>
+                        </a>
+                        <a href="case-study-couchbase-app-services.html" class="guide-route-link flex items-center p-2 rounded-xl border transition-all text-[11px] interactive group">
+                            <div class="truncate">
+                                <span class="font-medium block leading-tight truncate">App Services</span>
+                                <span class="text-[9px] font-mono block guide-route-metric">Edge Sync</span>
+                            </div>
+                        </a>
+                        <a href="case-study-warehouse-management.html" class="guide-route-link flex items-center p-2 rounded-xl border transition-all text-[11px] interactive group">
+                            <div class="truncate">
+                                <span class="font-medium block leading-tight truncate">Automotive WMS</span>
+                                <span class="text-[9px] font-mono block guide-route-metric">RFID Telemetry</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-2 border-t guide-divider mt-2">
+                        <button type="button" onclick="handlePromptClick('who-is-rupak')" class="flex-1 py-1.5 px-2.5 rounded-lg guide-btn-primary text-[10px] font-mono font-bold transition-all text-center interactive">
+                            Who is Rupak?
+                        </button>
+                        <a href="mailto:rbiswas5888@gmail.com" class="py-1.5 px-3 rounded-lg guide-btn-secondary text-[10px] font-mono transition-all text-center interactive flex items-center justify-center gap-1">
+                            <i data-lucide="mail" class="w-3 h-3"></i> Contact
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Avatar Button Trigger -->
+        <button id="guide-avatar-trigger" type="button" aria-label="Toggle Ask Guide & Explore" class="relative group cursor-pointer block border-0 bg-transparent p-0 text-left outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan interactive" onclick="toggleGuidePopover(null, event)">
+            <!-- Pulsing Ambient Rings -->
+            <div class="absolute -inset-2 rounded-full pulse-ring pointer-events-none"></div>
+            
+            <!-- Tooltip Badge (Visible on hover or idle) -->
+            <div id="guide-badge-hint" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl hidden sm:flex items-center gap-2 group-hover:scale-105 transition-all pointer-events-none">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span>Ask Guide & Explore</span>
+            </div>
+
+            <!-- Avatar Container -->
+            <div class="avatar-float relative w-16 h-16 sm:w-20 sm:h-20 guide-avatar-frame rounded-2xl p-1 border-2 transition-all overflow-hidden interactive">
+                <img src="Avatar.png" alt="Rupak Biswas - Guide Avatar" class="w-full h-full object-contain object-top transform group-hover:scale-105 transition-transform duration-300 pointer-events-none" onerror="this.onerror=null; this.src='resource/images/Avatar.png';">
+                <!-- Status Dot -->
+                <span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full guide-avatar-status-dot border-2 shadow-sm pointer-events-none"></span>
+            </div>
+        </button>
+    </div>
+
+    <!-- Google Gemini Integration Modal -->
+    <div id="gemini-modal" class="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="glass-panel max-w-md w-full rounded-2xl border border-white/20 p-6 shadow-2xl relative bg-[#0b0c13]/95">
+            <button type="button" onclick="closeGeminiModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors interactive">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-9 h-9 rounded-xl bg-brand-cyan/10 border border-brand-cyan/30 text-brand-cyan flex items-center justify-center">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">Google Gemini Integration</h3>
+                    <p class="text-[11px] font-mono text-gray-400">Power Ask Guide & Explore with live Gemini AI</p>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed mb-4">
+                Powered by Google Gemini AI. The concierge is strictly restricted to professional UX/UI design knowledge, usability engineering, design systems, and Rupak Biswas's enterprise blueprints. Off-topic prompts will be declined.
+            </p>
+
+            <div class="space-y-2 mb-5">
+                <label for="gemini-key-input" class="text-[11px] font-mono text-gray-400 uppercase tracking-wider block">Google Gemini API Key</label>
+                <input type="password" id="gemini-key-input" placeholder="AIzaSy..."
+                    class="w-full bg-white/5 border border-white/15 focus:border-brand-cyan/60 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-cyan/40 font-mono">
+                <div class="flex items-center justify-between text-[10px] text-gray-500 font-mono pt-1">
+                    <span>Stored locally in browser localStorage.</span>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-brand-cyan underline hover:text-cyan-300">Get Free Key &rarr;</a>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 pt-3 border-t border-white/10">
+                <button type="button" onclick="disconnectGeminiKey()" id="gemini-disconnect-btn" class="text-xs font-mono text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-lg hover:bg-rose-500/10 transition-colors interactive hidden">
+                    Disconnect
+                </button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button type="button" onclick="closeGeminiModal()" class="text-xs font-mono text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors interactive">
+                        Close
+                    </button>
+                    <button type="button" onclick="saveGeminiKey()" class="bg-brand-cyan hover:bg-[#5935E8] text-white hover:text-white font-mono font-bold text-xs px-4 py-2 rounded-xl transition-all interactive flex items-center gap-1.5 shadow-lg shadow-brand-cyan/20">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                        <span>Save & Activate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       JAVASCRIPT LOGIC (Cursor, AI Chat Bot, Filtering, Modals, Scroll Observers)
+       ========================================================================== -->
+    <script>
+        // 1. Initialize Lucide Icons & Year
+        lucide.createIcons();
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // ----------------------------------------------------------------------
+        // 2. Custom Interactive Dual-Layer Cursor Logic
+        // ----------------------------------------------------------------------
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorGlow = document.getElementById('cursor-glow');
+        
+        let mouseX = 0, mouseY = 0;
+        let glowX = 0, glowY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Immediate position update for precise inner dot
+            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+        });
+
+        // Smooth lerp animation loop for outer glow ring
+        function animateCursor() {
+            glowX += (mouseX - glowX) * 0.2;
+            glowY += (mouseY - glowY) * 0.2;
+            
+            cursorGlow.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Hover listeners for interactive elements
+        function attachCursorHoverListeners() {
+            const interactives = document.querySelectorAll('a, button, .interactive, .glass-card, .chip-btn, .tab-btn');
+            interactives.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+        }
+        attachCursorHoverListeners();
+
+        // ----------------------------------------------------------------------
+        // 3. AI Concierge & Chat Engine
+        // (Managed centrally by avatar-guide.js)
+        // ----------------------------------------------------------------------
+
+        // ----------------------------------------------------------------------
+        // 4. Project Filtering System
+        // ----------------------------------------------------------------------
+        function filterProjects(category) {
+            const cards = document.querySelectorAll('.project-card');
+            const tabs = document.querySelectorAll('.tab-btn');
+
+            tabs.forEach(tab => tab.classList.remove('active', 'bg-brand-cyan/20', 'border-brand-cyan'));
+
+            event.target.classList.add('active');
+
+            cards.forEach(card => {
+                if (category === 'all' || card.classList.contains(category)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // ----------------------------------------------------------------------
+        // 5. Dynamic Case Study Modal Data & Handlers
+        // ----------------------------------------------------------------------
+        const modalData = {
+            'banking': {
+                category: 'B2B FINTECH MODERNIZATION',
+                title: 'Corporate Digital Banking Architecture',
+                tags: ['B2B FinTech', 'Treasury OS', 'Compliance Engine'],
+                image: 'resource/images/Bank.png',
+                url: 'case-study-corporate-banking.html',
+                summary: 'Modernized a global tier-1 financial institution\'s corporate digital banking platform. Tackled multi-decade legacy backend debt, complex multi-entity permissioning, and strict international liquidity compliance rules.',
+                deliverables: [
+                    'Architected unified multi-currency treasury dashboard.',
+                    'Engineered granular role-based authorization matrix.',
+                    'Reduced transactional processing latency by 35%.',
+                    'Established tokenized design system adopted across 12 product squads.'
+                ]
+            },
+            'oilgas': {
+                category: 'GLOBAL ENERGY PLATFORM (EXXONMOBIL / DELOITTE)',
+                title: 'Oil & Gas Global Order Management OS',
+                tags: ['Energy OS', 'Order Rules Engine', '25 Languages'],
+                image: 'resource/images/oil-gas/hero_1.png',
+                url: 'case-study-oil-gas.html',
+                summary: 'Designed an enterprise order management platform for international oil and gas acquisitions, handling high-volume global fuel logistics and automated compliance checks across 100+ countries.',
+                deliverables: [
+                    'Built dynamic rules engine accommodating local country tax laws.',
+                    'Localized UI architecture for 25 languages with right-to-left (RTL) support.',
+                    'Streamlined multi-stage order approval workflows from 8 steps down to 3.',
+                    'Delivered full design system documentation for Deloitte implementation teams.'
+                ]
+            },
+            'tatapay': {
+                category: 'FINTECH ECOSYSTEM INTEGRATION',
+                title: 'Tata Pay Payment Platform',
+                tags: ['Payment Gateway', 'Consumer & Merchant UX', '+40% Adoption'],
+                image: 'resource/images/TataPay.png',
+                url: 'case-study-tata-pay.html',
+                summary: 'Orchestrated the payment gateway experience for Tata Pay, unifying multi-merchant checkout pipelines into a single, high-converting digital payment interface.',
+                deliverables: [
+                    'Unified 15+ sub-merchant payment flows under a cohesive UX model.',
+                    'Increased checkout completion rate by 40%.',
+                    'Integrated real-time biometric and OTP verification micro-interactions.'
+                ]
+            },
+            'appservice': {
+                category: 'ENTERPRISE SAAS & EDGE SYNC',
+                title: 'Capella App Services Offline-First Backend',
+                tags: ['Enterprise SaaS', 'Sync Gateway', 'Offline-First'],
+                image: 'resource/images/App_Service.png',
+                url: 'case-study-couchbase-app-services.html',
+                summary: 'Orchestrated Couchbase Capella App Services, transforming a complex CLI deployment into an intuitive cloud console accelerating developer Time-to-Integration (TTI) from weeks to minutes.',
+                deliverables: [
+                    'Compressed developer onboarding cycle from weeks to minutes.',
+                    'Engineered bidirectional sync telemetry without UI latency.',
+                    'Reduced configuration customer support tickets by 15%.',
+                    'Standardized enterprise RBAC and end-to-end token encryption.'
+                ]
+            },
+            'couchbase': {
+                category: 'DATABASE INFRASTRUCTURE & SAAS',
+                title: 'Couchbase Day 0 Admin Onboarding',
+                tags: ['Developer Experience', 'Database Infra', '-30% Setup Time'],
+                image: 'resource/images/Capella_Day_0/Day_0-02.png',
+                url: 'case-study-couchbase-day-0.html',
+                summary: 'Redesigned the initial cluster provisioning and Day 0 setup workflows for Couchbase enterprise database administrators.',
+                deliverables: [
+                    'Reduced initial cluster setup time by 30%.',
+                    'Created contextual diagnostic visualizers for node cluster health.',
+                    'Standardized dark-mode console UI patterns across cloud & on-prem services.'
+                ]
+            },
+            'wms': {
+                category: 'ENTERPRISE LOGISTICS & ERP',
+                title: 'Automotive Warehouse Management System',
+                tags: ['WMS Logistics', 'Automotive ERP', 'High Concurrency'],
+                image: 'resource/images/Automotive_Warehouse.png',
+                url: 'case-study-warehouse-management.html',
+                summary: 'Architected high-throughput logistics interfaces for automotive supply chain operations, facilitating real-time inventory tracking and automated floor routing.',
+                deliverables: [
+                    'Engineered touch-optimized tablet UI for warehouse operators.',
+                    'Decreased inventory barcode scan error rate by 22%.',
+                    'Implemented offline sync mode for active floor environments.'
+                ]
+            }
+        };
+
+        const caseModal = document.getElementById('case-modal');
+        const modalCategory = document.getElementById('modal-category');
+        const modalBody = document.getElementById('modal-body');
+
+        function openModal(key) {
+            const data = modalData[key];
+            if (!data) return;
+
+            modalCategory.textContent = data.category;
+            modalBody.innerHTML = `
+                <div class="h-56 sm:h-64 rounded-2xl overflow-hidden relative mb-4 bg-black/60">
+                    <img src="${data.image}" alt="${data.title}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1501167783395-523ef21012f3?auto=format&fit=crop&w=1200&q=80'">
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">${data.title}</h3>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    ${data.tags.map(tag => `<span class="px-2.5 py-1 rounded-md bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-xs font-mono">${tag}</span>`).join('')}
+                </div>
+                <p class="text-gray-300 text-sm leading-relaxed mb-6">${data.summary}</p>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
+                    <h4 class="text-xs font-mono text-brand-cyan uppercase tracking-wider mb-3">Key Strategic Deliverables</h4>
+                    <ul class="space-y-2 text-xs text-gray-300 font-sans">
+                        ${data.deliverables.map(item => `<li class="flex items-start gap-2"><span class="text-brand-cyan">✓</span> <span>${item}</span></li>`).join('')}
+                    </ul>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="${data.url}" class="flex-1 inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-brand-cyan hover:bg-[#5935E8] text-white hover:text-white font-bold text-xs font-mono tracking-wider transition-all shadow-lg shadow-cyan-500/20 interactive">
+                        <span>Explore Full Case Study & Architecture</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                    <button onclick="closeModal()" class="py-3 px-5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-mono text-gray-300 transition-colors interactive">
+                        Close Preview
+                    </button>
+                </div>
+            `;
+
+            caseModal.classList.remove('hidden');
+            caseModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            caseModal.classList.add('hidden');
+            caseModal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on click outside content
+        caseModal.addEventListener('click', (e) => {
+            if (e.target === caseModal) closeModal();
+        });
+
+        // ----------------------------------------------------------------------
+        // 6. Interactive Avatar Concierge Guide Controller
+        // Note: Controller functions are managed in avatar-guide.js. Popover remains
+        // open and fully interactive across clicks and scrolls until the Close CTA is clicked.
+        // ----------------------------------------------------------------------
+        function navigateAndAskOrchestrator(action) {
+            openGuidePopover(null, action);
+        }
+
+        // ----------------------------------------------------------------------
+        // 6b. Mobile Navigation Drawer Controller (Hamburger)
+        // ----------------------------------------------------------------------
+        let mobileMenuIsOpen = false;
+        function toggleMobileMenu() {
+            const drawer = document.getElementById('mobile-nav-drawer');
+            const icon = document.getElementById('mobile-menu-icon');
+            if (!drawer) return;
+            mobileMenuIsOpen = !mobileMenuIsOpen;
+            if (mobileMenuIsOpen) {
+                drawer.classList.remove('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                drawer.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                if (icon) icon.setAttribute('data-lucide', 'x');
+            } else {
+                drawer.classList.add('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                drawer.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                if (icon) icon.setAttribute('data-lucide', 'menu');
+            }
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && mobileMenuIsOpen) {
+                toggleMobileMenu();
+            }
+        });
+
+        // ----------------------------------------------------------------------
+        // 7. Scroll Reveal Observer
+        // ----------------------------------------------------------------------
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+    </script>
+    <script src="avatar-guide.js?v=2.3.0"></script>
+    <script src="astronomy-engine.js?v=2.2.0"></script>
+    <script src="astronomical-loader.js?v=2.2.0"></script>
+</body>
+</html>

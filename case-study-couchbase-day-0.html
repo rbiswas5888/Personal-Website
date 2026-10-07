@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Couchbase Capella Day 0 UX Onboarding Case Study - Accelerating Time-to-Value (TTV) by Rupak Biswas">
+    <meta name="robots" content="noarchive, noimageindex">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <title>Capella Day 0 Onboarding | Couchbase DBaaS — Rupak Biswas</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00f0ff',
+                            accent: '#38bdf8',
+                            purple: '#a855f7',
+                        },
+                        dark: {
+                            950: '#040406',
+                            900: '#070709',
+                            800: '#0f0f14',
+                            700: '#181820',
+                            600: '#23232f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070709;
+            --card-glass-bg: rgba(18, 18, 24, 0.65);
+            --card-glass-border: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f0ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: none;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor-dot, #cursor-glow { display: none !important; }
+        }
+
+        #cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.15s ease, height 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1px solid rgba(0, 240, 255, 0.5);
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+        }
+
+        body.cursor-hover #cursor-dot {
+            width: 12px; height: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        body.cursor-hover #cursor-glow {
+            width: 56px; height: 56px;
+            border-color: rgba(0, 240, 255, 0.9);
+            background-color: rgba(0, 240, 255, 0.12);
+            backdrop-filter: blur(2px);
+        }
+
+        .glass-panel {
+            background: var(--card-glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-glass-border);
+        }
+
+        .glass-card {
+            background: rgba(22, 22, 30, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px -10px rgba(0, 240, 255, 0.15);
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="theme-and-guide.css?v=2.3.0">
+</head>
+
+<body class="selection:bg-brand-cyan/20 selection:text-brand-cyan">
+    <div id="cursor-dot"></div>
+    <div id="cursor-glow"></div>
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group interactive">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform text-brand-cyan"></i>
+                    <span class="text-xs font-mono tracking-wider uppercase font-semibold">Back to Portfolio</span>
+                </a>
+                <span class="hidden sm:inline-block text-white/20">|</span>
+                <span class="hidden sm:inline-block text-xs font-mono text-gray-400">Couchbase Capella</span>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-6 text-xs font-mono text-gray-400">
+                <a href="#overview" class="hover:text-brand-cyan transition-colors interactive">Overview</a>
+                <a href="#comparison" class="hover:text-brand-cyan transition-colors interactive">Day 0 vs 1</a>
+                <a href="#strategy" class="hover:text-brand-cyan transition-colors interactive">UX Strategy</a>
+                <a href="#concept" class="hover:text-brand-cyan transition-colors interactive">Design Concept</a>
+                <a href="#impact" class="hover:text-brand-cyan transition-colors interactive">Impact</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="resource/images/Resume_Rupak_Biswas.pdf" target="_blank" class="glass-card px-3.5 py-1.5 rounded-full text-xs font-mono text-gray-200 hover:text-brand-cyan flex items-center gap-1.5 interactive">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span>Resume</span>
+                </a>
+                <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:border-brand-cyan transition-all interactive" title="Toggle Light / Dark Mode">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-400"></i>
+                </button>
+                <a href="mailto:contact@rupak-biswas.com" class="bg-brand-cyan/10 hover:bg-brand-cyan hover:text-white border border-brand-cyan/30 text-brand-cyan text-xs font-mono font-medium px-4 py-1.5 rounded-full transition-all interactive">
+                    Get in Touch
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-28 pb-20">
+        <!-- Hero Section -->
+        <section id="overview" class="px-6 max-w-7xl mx-auto pt-10 pb-16">
+            <div class="reveal-on-scroll">
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <span class="px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-mono font-semibold">DATABASE INFRASTRUCTURE</span>
+                    <span class="px-3 py-1 rounded-md bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-xs font-mono">TIME-TO-VALUE (TTV) OPTIMIZATION</span>
+                    <span class="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-xs font-mono">COUCHBASE CAPELLA DBaaS</span>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
+                    Couchbase Capella. <br>
+                    <span class="text-brand-cyan">
+                        Day 0 Admin Onboarding.
+                    </span>
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-gray-300 font-light max-w-4xl leading-relaxed mb-12">
+                    In enterprise software, friction breeds churn; time-to-value must be immediate. Architected an intuitive, frictionless onboarding journey that smoothed the critical transition from initial cluster provisioning (Day 0) to full production deployment (Day 1), driving an immediate 26% drop in early support tickets.
+                </p>
+
+                <!-- KPI Strip -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Ticket Reduction</span>
+                        <span class="text-3xl font-bold text-white font-mono text-brand-cyan">-26%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Day 1 support tickets</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Cluster Setup</span>
+                        <span class="text-3xl font-bold text-white font-mono">-30%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Faster provisioning</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Time-To-Value</span>
+                        <span class="text-3xl font-bold text-white font-mono">&lt; 5 min</span>
+                        <span class="block text-xs text-gray-400 mt-1">First database query</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Role</span>
+                        <span class="text-2xl font-bold text-white font-mono">Sr UX Lead</span>
+                        <span class="block text-xs text-gray-400 mt-1">Manager / Architect</span>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="glass-panel rounded-3xl overflow-hidden p-2 sm:p-4 border border-white/10 shadow-2xl relative group">
+                    <img src="resource/images/Capella_Day_0/Welcome%20to%20Capella.png" alt="Welcome to Couchbase Capella Interface" 
+                         class="w-full h-auto rounded-2xl object-cover cursor-zoom-in interactive"
+                         onclick="openLightbox(this.src)"
+                         onerror="this.onerror=null; this.src='resource/images/Capella_Day_0/Welcome-to-Capella.png';">
+                    <div class="absolute bottom-6 right-6 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-[11px] font-mono text-gray-300 pointer-events-none">
+                        Click to enlarge Day 0 welcome experience
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Metadata Table -->
+        <section class="border-y border-white/10 bg-black/40 py-10 px-6 mb-20">
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Product</span>
+                    <strong class="text-white text-sm">Couchbase Capella DBaaS</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Role</span>
+                    <strong class="text-white text-sm">Senior UX Designer / Manager</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Methodology</span>
+                    <strong class="text-white text-sm">User-Centered Design & Agile Sprints</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Target Persona</span>
+                    <strong class="text-white text-sm">Enterprise Database Admins & Cloud Engineers</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Day 0 vs Day 1 Bento Grid -->
+        <section id="comparison" class="px-6 max-w-7xl mx-auto py-16">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// ARCHITECTURAL PROGRESSION</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">Day 0 vs. Day 1 Operational Focus</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">
+                    Structuring clear demarcation between the initial evaluation/setup journey and sustainable, long-term multi-cluster database management.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 reveal-on-scroll">
+                <!-- Day 0 Card -->
+                <div class="glass-card rounded-3xl p-8 sm:p-10 border-t-2 border-t-brand-cyan">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-white">Day 0: Onboarding & Discovery</h3>
+                        <span class="px-3 py-1 rounded-full bg-brand-cyan/10 text-brand-cyan text-xs font-mono">Objective: Accelerate TTV</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-8 leading-relaxed">
+                        Prevent early evaluation drop-offs by orchestrating a frictionless guided path toward the developer's first successful database query.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-brand-cyan/10 flex items-center justify-center text-brand-cyan flex-shrink-0">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Minimalist Sign-Up & Project Initialization</h4>
+                                <p class="text-xs text-gray-400 mt-1">Stripped 6 legacy configuration gates, defaulting to optimal cloud regions and pre-allocated sample buckets.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-brand-cyan/10 flex items-center justify-center text-brand-cyan flex-shrink-0">
+                                <i data-lucide="play" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Contextual In-App Tutorials</h4>
+                                <p class="text-xs text-gray-400 mt-1">Interactive step-by-step tooltips guiding users through loading sample datasets, executing SQL++ queries, and reviewing index health.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-brand-cyan/10 flex items-center justify-center text-brand-cyan flex-shrink-0">
+                                <i data-lucide="activity" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Iterative Drop-Off Telemetry</h4>
+                                <p class="text-xs text-gray-400 mt-1">Monitored funnel drop-off analytics to refine unclear cluster tier choices and security IP whitelisting prompts.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 1 Card -->
+                <div class="glass-card rounded-3xl p-8 sm:p-10 border-t-2 border-t-purple-400">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-white">Day 1: Implementation & Scale</h3>
+                        <span class="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-mono">Objective: Operational Scale</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-8 leading-relaxed">
+                        Transitioning administrators into day-to-day cluster health observability, automated backup management, and eventing microservices.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Scalable Multi-Cluster Management</h4>
+                                <p class="text-xs text-gray-400 mt-1">Unified console views supporting seamless scaling across AWS, Azure, and Google Cloud provider clusters.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                <i data-lucide="share-2" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Elasticsearch & Third-Party Integrations</h4>
+                                <p class="text-xs text-gray-400 mt-1">Streamlined connectors for external logging, SIEM auditing, and real-time enterprise search index sync.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                <i data-lucide="code" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Data Tools Eventing Function Editor</h4>
+                                <p class="text-xs text-gray-400 mt-1">Integrated syntax-highlighted code editor allowing database engineers to write serverless event triggers directly in the UI.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cross-Functional Alignment Strip -->
+        <section class="px-6 max-w-7xl mx-auto py-12">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 border border-white/10 text-center reveal-on-scroll">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// CROSS-FUNCTIONAL ALIGNMENT</span>
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4">Uniting Product, Sales Engineering & Cloud Ops</h3>
+                <p class="text-gray-300 text-sm sm:text-base max-w-3xl mx-auto leading-relaxed mb-8">
+                    Onboarding is rarely just an interface redesign. By aligning sales objectives with engineering constraints, we created an intelligent flow that anticipated technical user hurdles (such as VPC peering and TLS certificate configuration) before they led to support escalations.
+                </p>
+                <div class="inline-flex items-center gap-3 bg-white/5 border border-brand-cyan/30 px-6 py-3 rounded-full text-brand-cyan font-mono text-sm">
+                    <i data-lucide="trending-down" class="w-4 h-4"></i>
+                    <span>Result: Reduced Day 1 customer support inquiries by 26%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Concept UI Showcase -->
+        <section id="concept" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// CONCEPT PROTOTYPING</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">Designing a Seamless Day 0</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">Exploring personalized pathways based on administrator experience and deployment requirements.</p>
+            </div>
+
+            <!-- Concept Visual -->
+            <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl mb-16 reveal-on-scroll">
+                <img src="resource/images/Capella_Day_0/Day%200%20-%20Concept.png" alt="Day 0 Concept UI" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)" onerror="this.onerror=null; this.src='resource/images/Capella_Day_0/Day-0-Concept.png';">
+                <p class="text-[11px] font-mono text-gray-400 text-center py-2">Day 0 High-Density Concept Blueprint</p>
+            </div>
+
+            <!-- 3 Pillars of Experience -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-on-scroll">
+                <div class="glass-card rounded-2xl p-6">
+                    <h4 class="text-base font-bold text-white mb-2">User Guidance & Education</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Capella offers advanced multi-model capabilities (KV, Query, Search, Analytics). Progressive disclosure prevented cognitive overload for new administrators.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-6">
+                    <h4 class="text-base font-bold text-white mb-2">Dynamic Persona Paths</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Dynamic onboarding prompts adjusted according to whether the user was an enterprise DevOps architect, full-stack developer, or data analyst.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-6">
+                    <h4 class="text-base font-bold text-white mb-2">Localization & Enterprise Tiers</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Modular UX framework designed to scale effortlessly across different regional languages and enterprise compliance tiers.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Hardware Output -->
+        <section id="strategy" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// THE PRODUCTION OUTPUT</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">The Deployed Administrator Experience</h2>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-4 sm:p-6 border border-white/10 shadow-2xl reveal-on-scroll max-w-4xl mx-auto flex flex-col items-center">
+                <div class="max-h-[640px] w-full overflow-hidden rounded-2xl flex items-center justify-center bg-black/40">
+                    <img src="resource/images/Capella_Day_0/MacBook%20Pro%2016_%20-%204.png" alt="Final MacBook Pro UI" class="max-h-[620px] w-auto object-contain rounded-xl cursor-zoom-in interactive hover:scale-[1.01] transition-transform" onclick="openLightbox(this.src)" onerror="this.onerror=null; this.src='resource/images/Capella_Day_0/MacBook-Pro-16-4.png';">
+                </div>
+            </div>
+        </section>
+
+        <!-- Measurable Impact -->
+        <section id="impact" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll">
+                <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                        <span class="text-xs font-mono text-gray-400 uppercase tracking-widest block mb-1">Next Case Study</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Automotive ERP: Warehouse Management System</h3>
+                        <p class="text-xs text-gray-400 mt-1">Tekion &middot; High-Concurrency Auto Parts Logistics &middot; RFID & IoT</p>
+                    </div>
+                    <a href="case-study-warehouse-management.html" class="bg-brand-cyan hover:bg-[#5935E8] text-white hover:text-white font-bold px-8 py-4 rounded-full transition-all flex items-center gap-3 text-sm font-mono tracking-wider interactive">
+                        <span>Read Next Case Study</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-white/10 text-center text-xs font-mono text-gray-500">
+        <p>&copy; 2024-2026 Rupak Biswas &middot; Senior Designer &middot; All Rights Reserved.</p>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 interactive">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl border border-white/10">
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        window.addEventListener('mousemove', (e) => {
+            cursorDot.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
+            
+            cursorGlow.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 250, fill: 'forwards' });
+        });
+
+        document.querySelectorAll('.interactive, a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+
+    <!-- ==========================================================================
+       INTERACTIVE AVATAR CONCIERGE & PORTFOLIO GUIDE (Case Study UX Walkthrough)
+       ========================================================================== -->
+    <div id="portfolio-guide-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-auto">
+        
+        <!-- Guide Dialogue / Routing Popover (Expandable) -->
+        <div id="guide-popover" onclick="event.stopPropagation()" class="w-80 sm:w-96 rounded-3xl border p-5 shadow-2xl mb-3 transition-all duration-300 transform origin-bottom-right scale-95 opacity-0 pointer-events-none backdrop-blur-2xl">
+            <!-- Popover Header -->
+            <div class="flex items-center justify-between pb-3 border-b guide-divider">
+                <div class="flex items-center gap-2.5">
+                    <div class="guide-headshot-frame w-8 h-8 rounded-full overflow-hidden border shadow-sm">
+                        <img src="Avatar-headshot.png" alt="Rupak Avatar" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='resource/images/rupak_avatar_headshot.png';">
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold flex items-center gap-1.5 guide-title">
+                            Rupak Biswas
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </h4>
+                        <span class="text-[10px] font-mono guide-subtitle">UX Guide & Concierge</span>
+                    </div>
+                </div>
+                <button type="button" onclick="closeGuidePopover(event)" class="guide-close-btn p-1.5 rounded-lg transition-colors interactive" title="Close Guide" aria-label="Close Guide">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Dynamic Guide Message & Screen-by-Screen Walkthrough -->
+            <div class="py-3.5">
+                <div class="p-3 rounded-2xl border guide-bubble-box">
+                    <p id="guide-speech-bubble" class="text-xs leading-relaxed">
+                        Welcome! Would you like me to walk you through this case study screen by screen like a Senior UX Director?
+                    </p>
+                </div>
+                <div id="guide-walkthrough-controls" class="mt-2">
+                    <button type="button" onclick="triggerGeminiScreenWalkthrough(event)" class="w-full py-2 px-3 rounded-xl guide-btn-primary font-bold text-xs font-mono transition-all flex items-center justify-center gap-1.5 shadow-sm interactive">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Start Screen-by-Screen Walkthrough</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fast Navigation Routes -->
+            <div class="space-y-1.5 pt-2 border-t guide-divider">
+                <span class="text-[9px] font-mono uppercase tracking-wider guide-section-label block px-1">Explore Other Blueprints</span>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <a href="case-study-corporate-banking.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">💳 Banking</a>
+                    <a href="case-study-oil-gas.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">⛽ Energy OS</a>
+                    <a href="case-study-tata-pay.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">📱 Tata Pay</a>
+                    <a href="case-study-couchbase-day-0.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">☁️ Couchbase</a>
+                </div>
+                <div class="pt-2">
+                    <a href="index.html" class="guide-btn-secondary w-full py-1.5 px-3 rounded-lg border text-[10px] font-mono transition-all text-center block interactive">
+                        &larr; Return to Executive Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Avatar Button Trigger -->
+        <button id="guide-avatar-trigger" type="button" aria-label="Toggle Ask Guide & Explore" class="relative group cursor-pointer block border-0 bg-transparent p-0 text-left outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan interactive" onclick="toggleGuidePopover(null, event)">
+            <div class="absolute -inset-2 rounded-full pulse-ring pointer-events-none"></div>
+            <div id="guide-badge-hint" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl hidden sm:flex items-center gap-2 group-hover:scale-105 transition-all pointer-events-none">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span>Explain Screens</span>
+            </div>
+            <div class="avatar-float relative w-16 h-16 sm:w-20 sm:h-20 guide-avatar-frame rounded-2xl p-1 border-2 transition-all overflow-hidden interactive">
+                <img src="Avatar.png" alt="Rupak Biswas - Guide Avatar" class="w-full h-full object-contain object-top transform group-hover:scale-105 transition-transform duration-300 pointer-events-none" onerror="this.onerror=null; this.src='resource/images/Avatar.png';">
+                <span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full guide-avatar-status-dot border-2 shadow-sm pointer-events-none"></span>
+            </div>
+        </button>
+    </div>
+
+
+    <!-- Guide Controller managed in avatar-guide.js (persists open until Close CTA is clicked) -->
+    <script src="avatar-guide.js?v=2.3.0"></script>
+
+</body>
+</html>

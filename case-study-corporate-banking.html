@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Standard Chartered Bank Corporate Digital Banking Case Study - UX Architecture & Treasury Systems by Rupak Biswas">
+    <meta name="robots" content="noarchive, noimageindex">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <title>Corporate Digital Banking | Standard Chartered Bank — Rupak Biswas</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00f0ff',
+                            accent: '#38bdf8',
+                            blue: '#2563eb',
+                        },
+                        dark: {
+                            950: '#040406',
+                            900: '#070709',
+                            800: '#0f0f14',
+                            700: '#181820',
+                            600: '#23232f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070709;
+            --card-glass-bg: rgba(18, 18, 24, 0.65);
+            --card-glass-border: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f0ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: none;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor-dot, #cursor-glow { display: none !important; }
+        }
+
+        /* Dual-layer interactive cursor */
+        #cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.15s ease, height 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1px solid rgba(0, 240, 255, 0.5);
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+        }
+
+        body.cursor-hover #cursor-dot {
+            width: 12px; height: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        body.cursor-hover #cursor-glow {
+            width: 56px; height: 56px;
+            border-color: rgba(0, 240, 255, 0.9);
+            background-color: rgba(0, 240, 255, 0.12);
+            backdrop-filter: blur(2px);
+        }
+
+        .glass-panel {
+            background: var(--card-glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-glass-border);
+        }
+
+        .glass-card {
+            background: rgba(22, 22, 30, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px -10px rgba(0, 240, 255, 0.15);
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 1.5rem;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        /* Lightbox modal */
+        #lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="theme-and-guide.css?v=2.3.0">
+</head>
+
+<body class="selection:bg-brand-cyan/20 selection:text-brand-cyan">
+    <!-- Custom Dual-Layer Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-glow"></div>
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group interactive">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform text-brand-cyan"></i>
+                    <span class="text-xs font-mono tracking-wider uppercase font-semibold">Back to Portfolio</span>
+                </a>
+                <span class="hidden sm:inline-block text-white/20">|</span>
+                <span class="hidden sm:inline-block text-xs font-mono text-gray-400">Standard Chartered Bank</span>
+            </div>
+
+            <!-- In-page Navigation -->
+            <nav class="hidden md:flex items-center gap-6 text-xs font-mono text-gray-400">
+                <a href="#overview" class="hover:text-brand-cyan transition-colors interactive">Overview</a>
+                <a href="#architecture" class="hover:text-brand-cyan transition-colors interactive">Architecture</a>
+                <a href="#design-system" class="hover:text-brand-cyan transition-colors interactive">Design System</a>
+                <a href="#interfaces" class="hover:text-brand-cyan transition-colors interactive">Screens</a>
+                <a href="#impact" class="hover:text-brand-cyan transition-colors interactive">Impact</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="resource/images/Resume_Rupak_Biswas.pdf" target="_blank" class="glass-card px-3.5 py-1.5 rounded-full text-xs font-mono text-gray-200 hover:text-brand-cyan flex items-center gap-1.5 interactive">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span>Resume</span>
+                </a>
+                <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:border-brand-cyan transition-all interactive" title="Toggle Light / Dark Mode">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-400"></i>
+                </button>
+                <a href="mailto:contact@rupak-biswas.com" class="bg-brand-cyan/10 hover:bg-brand-cyan hover:text-white border border-brand-cyan/30 text-brand-cyan text-xs font-mono font-medium px-4 py-1.5 rounded-full transition-all interactive">
+                    Get in Touch
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-28 pb-20">
+        <!-- Hero Section -->
+        <section id="overview" class="px-6 max-w-7xl mx-auto pt-10 pb-16">
+            <div class="reveal-on-scroll">
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <span class="px-3 py-1 rounded-md bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-xs font-mono font-semibold">B2B FINTECH</span>
+                    <span class="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-xs font-mono">GLOBAL TREASURY OS</span>
+                    <span class="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono">STANDARD CHARTERED BANK</span>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
+                    Corporate Digital Banking. <br>
+                    <span class="text-brand-cyan">
+                        Modernized Treasury Architecture.
+                    </span>
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-gray-300 font-light max-w-4xl leading-relaxed mb-12">
+                    Architected a unified global treasury ecosystem for tier-1 institutional clients. Navigated deep legacy tech debt and strict Basel III regulatory compliance to accelerate liquidity decision-making, straight-through processing, and multi-tier Maker/Checker transaction authorizations.
+                </p>
+
+                <!-- KPI Strip -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Treasury Volume</span>
+                        <span class="text-3xl font-bold text-white font-mono text-brand-cyan">$100B+</span>
+                        <span class="block text-xs text-gray-400 mt-1">Daily liquidity visibility</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">STP Rate Lift</span>
+                        <span class="text-3xl font-bold text-white font-mono">+38%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Straight-Through Processing</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Approval Time</span>
+                        <span class="text-3xl font-bold text-white font-mono">-65%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Maker/Checker cycle time</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Executive Role</span>
+                        <span class="text-2xl font-bold text-white font-mono">Lead UX</span>
+                        <span class="block text-xs text-gray-400 mt-1">Cross-matrix strategist</span>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="glass-panel rounded-3xl overflow-hidden p-2 sm:p-4 border border-white/10 shadow-2xl relative group">
+                    <img src="resource/images/scb/corporate-bank.png" alt="Standard Chartered Corporate Banking Dashboard Mockup" 
+                         class="w-full h-auto rounded-2xl object-cover cursor-zoom-in interactive"
+                         onclick="openLightbox(this.src)"
+                         onerror="this.src='resource/images/Bank.png'">
+                    <div class="absolute bottom-6 right-6 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-[11px] font-mono text-gray-300 pointer-events-none">
+                        Click to enlarge high-res view
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Metadata Table -->
+        <section class="border-y border-white/10 bg-black/40 py-10 px-6 mb-20">
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Client & Domain</span>
+                    <strong class="text-white text-sm">Standard Chartered Bank &middot; Global Markets</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">My Role</span>
+                    <strong class="text-white text-sm">Lead UX Strategist & Systems Architect</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Capabilities</span>
+                    <strong class="text-white text-sm">High-Density IA, Risk Governance, Design Systems</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Ecosystem Scope</span>
+                    <strong class="text-white text-sm">SAP / Oracle Host-to-Host & API Integrations</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Strategic Mandate -->
+        <section id="architecture" class="px-6 max-w-7xl mx-auto py-16">
+            <div class="reveal-on-scroll grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest">// THE STRATEGIC MANDATE</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Engineering for Liquidity, Scale, and Regulatory Rigor.</h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        The legacy corporate portal fragmented cash visibility across multiple disjointed regional accounts. Institutional treasurers and CFOs were forced to export raw statements into spreadsheet models to ascertain global cash positions at day-close.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        The mandate was to build an enterprise-grade command center that accelerated decision-making for executive CFOs while streamlining multi-million dollar bulk batch payments for AP/AR operations teams, ensuring zero-fault tolerance for high-stakes capital movements.
+                    </p>
+
+                    <div class="space-y-4 pt-2">
+                        <div class="glass-card rounded-xl p-4 flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-brand-cyan/10 border border-brand-cyan/30 flex items-center justify-center flex-shrink-0 text-brand-cyan">
+                                <i data-lucide="layers" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">High-Density Data Architecture</h4>
+                                <p class="text-xs text-gray-400 mt-1">Corporate operators do not need consumer whitespace. We engineered high-density data tables with progressive disclosure, predictive sorting, and exception flagging to navigate millions in transactional line items.</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-xl p-4 flex gap-4 items-start">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-blue-400">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Maker / Checker Dual Authorization</h4>
+                                <p class="text-xs text-gray-400 mt-1">Navigated strict institutional compliance matrices to enforce clear segregation of duties: clerks assemble batches while C-level authorized signers authenticate with biometric/token workflows.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="glass-card rounded-3xl p-3 overflow-hidden border border-white/10 group">
+                        <img src="resource/images/scb/flow.jpg" alt="Corporate Banking Architecture & User Flow" 
+                             class="w-full rounded-2xl object-cover cursor-zoom-in interactive"
+                             onclick="openLightbox(this.src)">
+                        <p class="text-[11px] font-mono text-gray-400 text-center py-2">Workflow Analysis & End-to-End Treasury Payment Lifecycle</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ecosystem & ERP Integration Banner -->
+        <section class="px-6 max-w-7xl mx-auto py-12">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 border border-white/10 relative overflow-hidden reveal-on-scroll">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// HOST-TO-HOST & SYSTEMIC RESILIENCE</span>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4">Bridging Legacy ERPs with Modern APIs</h3>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed mb-8">
+                        The solution connected directly into native ERP backends (SAP, Oracle Financials) for real-time reconciliation. Our UI framework handled exception validation dynamically while asynchronous APIs executed bulk transfers without latency on the user interface.
+                    </p>
+                </div>
+                <div class="rounded-2xl overflow-hidden border border-white/10 bg-black/60 p-2">
+                    <img src="resource/images/scb/approach.jpg" alt="System Approach Diagram" 
+                         class="w-full rounded-xl cursor-zoom-in interactive"
+                         onclick="openLightbox(this.src)">
+                </div>
+            </div>
+        </section>
+
+        <!-- Design System Governance (Bento Grid) -->
+        <section id="design-system" class="px-6 max-w-7xl mx-auto py-20">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// SYSTEMIC FOUNDATION</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">Institutional Component Governance</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">
+                    Scalability in enterprise finance demands strict atomic consistency. We built a standardized component library and token model to govern 400+ distinct enterprise UI elements across web and native clients.
+                </p>
+            </div>
+
+            <!-- Bento Grid of System Assets -->
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 reveal-on-scroll">
+                <!-- Style Guide (Large Box) -->
+                <div class="md:col-span-2 lg:col-span-2 glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white">Component Hierarchy</h3>
+                            <span class="text-xs font-mono text-brand-cyan">Atoms to Organisms</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Reusable modules: account status chips, currency inputs, risk banners, and verification sheets.</p>
+                    </div>
+                    <div class="h-60 sm:h-72 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/50">
+                        <img src="resource/images/scb/style-guide.jpg" alt="Design System Style Guide" class="w-full h-full object-cover object-top cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <!-- Colors & Risk Matrix -->
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white">Systemic Colors</h3>
+                            <span class="text-xs font-mono text-blue-400">WCAG AAA</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Engineered semantic color tokens for fraud alerts, audit confirmations, and risk states.</p>
+                    </div>
+                    <div class="h-44 sm:h-52 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/50">
+                        <img src="resource/images/scb/colors.jpg" alt="Color System" class="w-full h-full object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <!-- High-Density Grids -->
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white">Modular Grids</h3>
+                            <span class="text-xs font-mono text-brand-cyan">8pt System</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">High-density data alignments accommodating multi-currency decimal accuracy and sorting.</p>
+                    </div>
+                    <div class="h-44 sm:h-52 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/50">
+                        <img src="resource/images/scb/grid.jpg" alt="Grid System" class="w-full h-full object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <!-- Iconography & Typography -->
+                <div class="md:col-span-2 glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white">Financial Iconography & Text Hierarchy</h3>
+                            <span class="text-xs font-mono text-gray-400">Optimized Legibility</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Custom vector glyphs designed for high readability on low-contrast trading floor monitors.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="h-36 sm:h-44 rounded-xl overflow-hidden border border-white/10 bg-black/50">
+                            <img src="resource/images/scb/icon-text.jpg" alt="Iconography and typography" class="w-full h-full object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                        </div>
+                        <div class="h-36 sm:h-44 rounded-xl overflow-hidden border border-white/10 bg-black/50">
+                            <img src="resource/images/scb/icons.jpg" alt="Icons Matrix" class="w-full h-full object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accessibility Deep Dive -->
+                <div class="md:col-span-2 glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white">Inclusive Accessibility & Contrast Validation</h3>
+                            <span class="text-xs font-mono text-emerald-400">Strict Compliance</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Validated against protanopia, deuteranopia, and tritanopia color blindness scenarios.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="h-36 sm:h-44 rounded-xl overflow-hidden border border-white/10 bg-black/50">
+                            <img src="resource/images/scb/accessibility-color.jpg" alt="Accessibility Color Testing" class="w-full h-full object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                        </div>
+                        <div class="h-36 sm:h-44 rounded-xl overflow-hidden border border-white/10 bg-black/50">
+                            <img src="resource/images/scb/accessibility-color-map.jpg" alt="Accessibility Map" class="w-full h-full object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Interface Walkthrough -->
+        <section id="interfaces" class="px-6 max-w-7xl mx-auto py-20">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-20">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// INTERFACE DEEP DIVE</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">Key Screens & Operational Workflows</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">
+                    Transforming convoluted banking operations into intuitive, mission-critical dashboards.
+                </p>
+            </div>
+
+            <!-- Screen 1: Dashboard -->
+            <div class="reveal-on-scroll mb-24">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+                    <div>
+                        <span class="text-xs font-mono text-brand-cyan">SCREEN 01 &middot; GLOBAL VISIBILITY</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Global Treasury & Multi-Currency Liquidity Dashboard</h3>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-400 max-w-md">Provides corporate CFOs with real-time liquidity snapshots across 45+ jurisdictions with predictive cash-pooling forecasts.</p>
+                </div>
+                <div class="glass-panel rounded-3xl p-3 overflow-hidden border border-white/10 shadow-2xl">
+                    <img src="resource/images/scb/dashboard.jpg" alt="Global Treasury Dashboard" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                </div>
+            </div>
+
+            <!-- Screen 2: Bulk Payment -->
+            <div class="reveal-on-scroll mb-24">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+                    <div>
+                        <span class="text-xs font-mono text-brand-cyan">SCREEN 02 &middot; EXECUTION ENGINE</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Bulk Payment Initiation & Dual-Tier Authorization</h3>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-400 max-w-md">Optimized for high-volume payroll and supplier transfers, incorporating automated beneficiary verification and fraud checks.</p>
+                </div>
+                <div class="glass-panel rounded-3xl p-3 overflow-hidden border border-white/10 shadow-2xl">
+                    <img src="resource/images/scb/payment.jpg" alt="Bulk Payment Initiation" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                </div>
+            </div>
+
+            <!-- Screen 3: Exception & Traceability Side-by-Side -->
+            <div class="reveal-on-scroll grid grid-cols-1 lg:grid-cols-2 gap-8 mb-24">
+                <div class="glass-card rounded-3xl p-6">
+                    <span class="text-xs font-mono text-brand-cyan mb-2 block">SCREEN 03 &middot; EXCEPTION MANAGEMENT</span>
+                    <h4 class="text-xl font-bold text-white mb-4">Proactive Payment Diagnostics</h4>
+                    <p class="text-xs text-gray-400 mb-4">Real-time alert engine isolating failed line items without stalling entire batch disbursements.</p>
+                    <div class="h-64 sm:h-72 lg:h-80 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/60">
+                        <img src="resource/images/scb/page.jpg" alt="Exception Management" class="w-full h-full object-cover object-top cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <span class="text-xs font-mono text-brand-cyan mb-2 block">SCREEN 04 &middot; AUDIT TRACEABILITY</span>
+                    <h4 class="text-xl font-bold text-white mb-4">Complete Audit & Transaction Ledger</h4>
+                    <p class="text-xs text-gray-400 mb-4">Cryptographically signed transaction trails for internal risk compliance and SWIFT gpi tracking.</p>
+                    <div class="h-64 sm:h-72 lg:h-80 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/60">
+                        <img src="resource/images/scb/transaction.jpg" alt="Transaction Audit Ledger" class="w-full h-full object-cover object-top cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 4: High Performance Summary Table -->
+            <div class="reveal-on-scroll">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+                    <div>
+                        <span class="text-xs font-mono text-brand-cyan">SCREEN 05 &middot; DATA DENSITY</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Multi-Entity Account Balance & Cash Pooling Summary</h3>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-400 max-w-md">Aggregated real-time account balances with custom tagging and instant ledger export.</p>
+                </div>
+                <div class="glass-panel rounded-3xl p-3 overflow-hidden border border-white/10 shadow-2xl">
+                    <img src="resource/images/scb/summary.jpg" alt="Account Balance Summary" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Showcase Section -->
+        <section class="px-6 max-w-7xl mx-auto py-16 border-t border-white/10">
+            <div class="reveal-on-scroll max-w-4xl mx-auto text-center">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// VIDEO PROTOTYPE</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-6">See the Architecture in Motion</h2>
+                <p class="text-gray-400 text-sm mb-10 max-w-2xl mx-auto">Interactive walkthrough demonstrating batch orchestration, maker/checker delegation, and high-density liquidity filtering.</p>
+                
+                <div class="video-container shadow-2xl ring-1 ring-white/10 border border-white/10">
+                    <iframe src="https://player.vimeo.com/video/280102001?h=7aa860b555&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <p class="mt-4 text-xs font-mono text-gray-500">Standard Chartered Bank Prototype Demo &middot; Rupak Biswas</p>
+            </div>
+        </section>
+
+        <!-- Measurable Impact & Business Outcomes -->
+        <section id="impact" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// MEASURABLE BUSINESS OUTCOMES</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-12">Executive ROI & Operational Transformation</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">+38%</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Straight-Through Processing</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Automated formatting and upfront error parsing eliminated 38% of common settlement rejects, saving millions in daily fail fees.</p>
+                    </div>
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">-65%</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Approval Velocity</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Streamlined dual-tier signature workflows, allowing corporate treasurers to approve high-value transactions from mobile devices in seconds.</p>
+                    </div>
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">Zero</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Critical Audit Violations</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Built-in role-based segregation of duties ensured 100% compliance across international financial audits and strict banking regulations.</p>
+                    </div>
+                </div>
+
+                <!-- Next Project Bottom Pager -->
+                <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                        <span class="text-xs font-mono text-gray-400 uppercase tracking-widest block mb-1">Next Case Study</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Oil & Gas: Global Commerce OS</h3>
+                        <p class="text-xs text-gray-400 mt-1">ExxonMobil / Deloitte &middot; 100+ Countries &middot; 25 Languages</p>
+                    </div>
+                    <a href="case-study-oil-gas.html" class="bg-brand-cyan hover:bg-[#5935E8] text-white hover:text-white font-bold px-8 py-4 rounded-full transition-all flex items-center gap-3 text-sm font-mono tracking-wider interactive">
+                        <span>Read Next Case Study</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-white/10 text-center text-xs font-mono text-gray-500">
+        <p>&copy; 2024-2026 Rupak Biswas &middot; Senior Designer &middot; All Rights Reserved.</p>
+    </footer>
+
+    <!-- Lightbox Modal for Fullscreen Image View -->
+    <div id="lightbox-modal" class="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 interactive">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl border border-white/10">
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        // Dual layer cursor tracking
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        window.addEventListener('mousemove', (e) => {
+            cursorDot.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
+            
+            cursorGlow.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 250, fill: 'forwards' });
+        });
+
+        document.querySelectorAll('.interactive, a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        // Scroll observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+        // Lightbox functionality
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+
+    <!-- ==========================================================================
+       INTERACTIVE AVATAR CONCIERGE & PORTFOLIO GUIDE (Case Study UX Walkthrough)
+       ========================================================================== -->
+    <div id="portfolio-guide-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-auto">
+        
+        <!-- Guide Dialogue / Routing Popover (Expandable) -->
+        <div id="guide-popover" onclick="event.stopPropagation()" class="w-80 sm:w-96 rounded-3xl border p-5 shadow-2xl mb-3 transition-all duration-300 transform origin-bottom-right scale-95 opacity-0 pointer-events-none backdrop-blur-2xl">
+            <!-- Popover Header -->
+            <div class="flex items-center justify-between pb-3 border-b guide-divider">
+                <div class="flex items-center gap-2.5">
+                    <div class="guide-headshot-frame w-8 h-8 rounded-full overflow-hidden border shadow-sm">
+                        <img src="Avatar-headshot.png" alt="Rupak Avatar" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='resource/images/rupak_avatar_headshot.png';">
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold flex items-center gap-1.5 guide-title">
+                            Rupak Biswas
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </h4>
+                        <span class="text-[10px] font-mono guide-subtitle">UX Guide & Concierge</span>
+                    </div>
+                </div>
+                <button type="button" onclick="closeGuidePopover(event)" class="guide-close-btn p-1.5 rounded-lg transition-colors interactive" title="Close Guide" aria-label="Close Guide">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Dynamic Guide Message & Screen-by-Screen Walkthrough -->
+            <div class="py-3.5">
+                <div class="p-3 rounded-2xl border guide-bubble-box">
+                    <p id="guide-speech-bubble" class="text-xs leading-relaxed">
+                        Welcome! Would you like me to walk you through this case study screen by screen like a Senior UX Director?
+                    </p>
+                </div>
+                <div id="guide-walkthrough-controls" class="mt-2">
+                    <button type="button" onclick="triggerGeminiScreenWalkthrough(event)" class="w-full py-2 px-3 rounded-xl guide-btn-primary font-bold text-xs font-mono transition-all flex items-center justify-center gap-1.5 shadow-sm interactive">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Start Screen-by-Screen Walkthrough</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fast Navigation Routes -->
+            <div class="space-y-1.5 pt-2 border-t guide-divider">
+                <span class="text-[9px] font-mono uppercase tracking-wider guide-section-label block px-1">Explore Other Blueprints</span>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <a href="case-study-corporate-banking.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">💳 Banking</a>
+                    <a href="case-study-oil-gas.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">⛽ Energy OS</a>
+                    <a href="case-study-tata-pay.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">📱 Tata Pay</a>
+                    <a href="case-study-couchbase-day-0.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">☁️ Couchbase</a>
+                </div>
+                <div class="pt-2">
+                    <a href="index.html" class="guide-btn-secondary w-full py-1.5 px-3 rounded-lg border text-[10px] font-mono transition-all text-center block interactive">
+                        &larr; Return to Executive Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Avatar Button Trigger -->
+        <button id="guide-avatar-trigger" type="button" aria-label="Toggle Ask Guide & Explore" class="relative group cursor-pointer block border-0 bg-transparent p-0 text-left outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan interactive" onclick="toggleGuidePopover(null, event)">
+            <div class="absolute -inset-2 rounded-full pulse-ring pointer-events-none"></div>
+            <div id="guide-badge-hint" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl hidden sm:flex items-center gap-2 group-hover:scale-105 transition-all pointer-events-none">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span>Explain Screens</span>
+            </div>
+            <div class="avatar-float relative w-16 h-16 sm:w-20 sm:h-20 guide-avatar-frame rounded-2xl p-1 border-2 transition-all overflow-hidden interactive">
+                <img src="Avatar.png" alt="Rupak Biswas - Guide Avatar" class="w-full h-full object-contain object-top transform group-hover:scale-105 transition-transform duration-300 pointer-events-none" onerror="this.onerror=null; this.src='resource/images/Avatar.png';">
+                <span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full guide-avatar-status-dot border-2 shadow-sm pointer-events-none"></span>
+            </div>
+        </button>
+    </div>
+
+
+    <!-- Guide Controller managed in avatar-guide.js (persists open until Close CTA is clicked) -->
+    <script src="avatar-guide.js?v=2.3.0"></script>
+
+</body>
+</html>

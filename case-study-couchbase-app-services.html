@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Couchbase Capella App Services Case Study - Enterprise SaaS & Offline-First Developer Experience by Rupak Biswas">
+    <meta name="robots" content="noarchive, noimageindex">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <title>Capella App Services | Couchbase Enterprise — Rupak Biswas</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00f0ff',
+                            accent: '#38bdf8',
+                            blue: '#3b82f6',
+                        },
+                        dark: {
+                            950: '#040406',
+                            900: '#070709',
+                            800: '#0f0f14',
+                            700: '#181820',
+                            600: '#23232f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070709;
+            --card-glass-bg: rgba(18, 18, 24, 0.65);
+            --card-glass-border: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f0ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: none;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor-dot, #cursor-glow { display: none !important; }
+        }
+
+        #cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.15s ease, height 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1px solid rgba(0, 240, 255, 0.5);
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+        }
+
+        body.cursor-hover #cursor-dot {
+            width: 12px; height: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        body.cursor-hover #cursor-glow {
+            width: 56px; height: 56px;
+            border-color: rgba(0, 240, 255, 0.9);
+            background-color: rgba(0, 240, 255, 0.12);
+            backdrop-filter: blur(2px);
+        }
+
+        .glass-panel {
+            background: var(--card-glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-glass-border);
+        }
+
+        .glass-card {
+            background: rgba(22, 22, 30, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px -10px rgba(0, 240, 255, 0.15);
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="theme-and-guide.css?v=2.3.0">
+</head>
+
+<body class="selection:bg-brand-cyan/20 selection:text-brand-cyan">
+    <div id="cursor-dot"></div>
+    <div id="cursor-glow"></div>
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group interactive">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform text-brand-cyan"></i>
+                    <span class="text-xs font-mono tracking-wider uppercase font-semibold">Back to Portfolio</span>
+                </a>
+                <span class="hidden sm:inline-block text-white/20">|</span>
+                <span class="hidden sm:inline-block text-xs font-mono text-gray-400">Couchbase Capella</span>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-6 text-xs font-mono text-gray-400">
+                <a href="#overview" class="hover:text-brand-cyan transition-colors interactive">Overview</a>
+                <a href="#drivers" class="hover:text-brand-cyan transition-colors interactive">Business Drivers</a>
+                <a href="#architecture" class="hover:text-brand-cyan transition-colors interactive">Architecture</a>
+                <a href="#screens" class="hover:text-brand-cyan transition-colors interactive">Outputs</a>
+                <a href="#impact" class="hover:text-brand-cyan transition-colors interactive">ROI</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="resource/images/Resume_Rupak_Biswas.pdf" target="_blank" class="glass-card px-3.5 py-1.5 rounded-full text-xs font-mono text-gray-200 hover:text-brand-cyan flex items-center gap-1.5 interactive">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span>Resume</span>
+                </a>
+                <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:border-brand-cyan transition-all interactive" title="Toggle Light / Dark Mode">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-400"></i>
+                </button>
+                <a href="mailto:contact@rupak-biswas.com" class="bg-brand-cyan/10 hover:bg-brand-cyan hover:text-white border border-brand-cyan/30 text-brand-cyan text-xs font-mono font-medium px-4 py-1.5 rounded-full transition-all interactive">
+                    Contact
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-28 pb-20">
+        <!-- Hero Section -->
+        <section id="overview" class="px-6 max-w-7xl mx-auto pt-10 pb-16">
+            <div class="reveal-on-scroll">
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <span class="px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-mono font-semibold">ENTERPRISE SAAS</span>
+                    <span class="px-3 py-1 rounded-md bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-xs font-mono">OFFLINE-FIRST BACKEND</span>
+                    <span class="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-xs font-mono">COUCHBASE CAPELLA</span>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
+                    Capella App Services. <br>
+                    <span class="text-brand-cyan">
+                        Zero-Server Backend Orchestration.
+                    </span>
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-gray-300 font-light max-w-4xl leading-relaxed mb-12">
+                    Strategic orchestration of Capella App Services, Couchbase's fully managed backend solution. Bridged complex distributed database architecture with developer experience (DX) to compress Time-to-Integration (TTI) from weeks to minutes while upholding rigid enterprise security and multi-cloud scalability.
+                </p>
+
+                <!-- KPI Strip -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Time-to-Integration</span>
+                        <span class="text-3xl font-bold text-white font-mono text-brand-cyan">Weeks&rarr;Min</span>
+                        <span class="block text-xs text-gray-400 mt-1">Accelerated onboarding</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Support Overhead</span>
+                        <span class="text-3xl font-bold text-white font-mono">-15%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Fewer config tickets</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Edge Sync Reliability</span>
+                        <span class="text-3xl font-bold text-white font-mono">99.99%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Offline-first integrity</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Leadership Role</span>
+                        <span class="text-2xl font-bold text-white font-mono">Acting VP</span>
+                        <span class="block text-xs text-gray-400 mt-1">Head of Design</span>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="glass-panel rounded-3xl overflow-hidden p-2 sm:p-4 border border-white/10 shadow-2xl relative group">
+                    <img src="resource/images/App_Service/3.png" alt="Capella App Services Console Hero" 
+                         class="w-full h-auto rounded-2xl object-cover cursor-zoom-in interactive"
+                         onclick="openLightbox(this.src)"
+                         onerror="this.src='resource/images/App_Service.png'">
+                    <div class="absolute bottom-6 right-6 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-[11px] font-mono text-gray-300 pointer-events-none">
+                        Click to enlarge developer console
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Metadata Table -->
+        <section class="border-y border-white/10 bg-black/40 py-10 px-6 mb-20">
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Client & Product</span>
+                    <strong class="text-white text-sm">Couchbase Enterprise &middot; Capella DBaaS</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Role</span>
+                    <strong class="text-white text-sm">Acting VP / Head of Design</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Key Disciplines</span>
+                    <strong class="text-white text-sm">Developer Experience (DX), Sync Gateways, RBAC</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Architectural Focus</span>
+                    <strong class="text-white text-sm">Offline-First Edge Synchronization &middot; Zero-Server</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Statement & Overview -->
+        <section class="px-6 max-w-7xl mx-auto py-16">
+            <div class="reveal-on-scroll grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest">// THE BUSINESS CHALLENGE</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Offline-First. Enterprise-Grade. Frictionless.</h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        Capella App Services powers bidirectional data synchronization between Couchbase clusters and mobile or IoT edge applications. For enterprise clients, custom backend sync infrastructure has historically been a massive cost sink and operational risk.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Couchbase needed to lower the barrier to entry for enterprise developers adopting our offline-first backend. The challenge was transitioning from a complex, CLI-driven configuration model to an intuitive web console that simplified synchronization routing, conflict handling, and access control without sacrificing technical depth.
+                    </p>
+
+                    <div class="glass-card rounded-2xl p-5 border border-white/10">
+                        <h4 class="text-sm font-bold text-white mb-2">The Zero-Server Management Vision</h4>
+                        <p class="text-xs text-gray-400">Facilitated cross-functional alignment between backend engineering, cloud operations, and product leadership to replace manual cluster sync scripts with point-and-click governance.</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="glass-card rounded-3xl p-3 overflow-hidden border border-white/10">
+                        <img src="resource/images/App_Service/1.png" alt="Capella Overview Screen" class="w-full rounded-2xl object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                        <p class="text-[11px] font-mono text-gray-400 text-center py-2">Systemic Overview & App Endpoint Setup</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3 Key Business Drivers -->
+        <section id="drivers" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// STRATEGIC DISCOVERY</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">Key Business Drivers</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">
+                    Conducting deep-dive workflow analyses with 15+ lead enterprise architects revealed 3 fundamental friction points across matrixed enterprise organizations.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-on-scroll">
+                <div class="glass-card rounded-3xl p-8 border-t-2 border-t-brand-cyan">
+                    <div class="w-10 h-10 rounded-xl bg-brand-cyan/10 text-brand-cyan flex items-center justify-center mb-6">
+                        <i data-lucide="zap" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Time-to-Integration (TTI)</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        Enterprise teams needed setup cycles reduced from multi-week manual DevOps sprints to immediate guided configuration, enabling rapid application deployment.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8 border-t-2 border-t-blue-500">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-6">
+                        <i data-lucide="wifi-off" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Offline-First Resilience</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        Crucial business requirement for conflict-free edge synchronization that maintains data integrity during extended remote and partitioned network disconnects.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8 border-t-2 border-t-purple-500">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-6">
+                        <i data-lucide="shield" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Enterprise Governance</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        Strict security mandates necessitated seamless Role-Based Access Control (RBAC) and end-to-end token encryption without cluttering the developer interface.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Design & System Visualization -->
+        <section id="architecture" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest">// BRIDGING DESIGN & ENGINEERING</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Influencing Architecture & Bidirectional Flow Mapping</h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        We mapped developers' mental models directly to real-world distributed database sync pipelines. By actively collaborating with systems engineers on API payload design, we ensured real-time metrics could be rendered without performance lag.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="glass-card rounded-2xl p-4">
+                            <h4 class="text-sm font-bold text-white">Bidirectional Sync Mapping</h4>
+                            <p class="text-xs text-gray-400 mt-1">Visualized automated conflict resolution rules, turning opaque backend consensus protocols into clean, understandable UI state indicators.</p>
+                        </div>
+                        <div class="glass-card rounded-2xl p-4">
+                            <h4 class="text-sm font-bold text-white">Secure Data Routing</h4>
+                            <p class="text-xs text-gray-400 mt-1">Engineered the UX for granular channel routing and authentication keys, eliminating dangerous security configuration mistakes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="glass-card rounded-3xl p-3 overflow-hidden border border-white/10">
+                        <img src="resource/images/App_Service/2.png" alt="API Architecture & Data Flow Diagram" class="w-full rounded-2xl object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                        <p class="text-[11px] font-mono text-gray-400 text-center py-2">API Architecture & Bidirectional Edge Sync Pipeline</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen Showcase: Security, Settings & Section 1 -->
+        <section id="screens" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// PRODUCTION INTERFACES</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">The Deployed Interface Suite</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">Intuitive interfaces orchestrating complex database security, rapid endpoint provisioning, and cluster administration.</p>
+            </div>
+
+            <div class="space-y-16 reveal-on-scroll">
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">1. App Endpoint Orchestration & Synchronization</h3>
+                    <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl overflow-hidden">
+                        <div class="max-h-[540px] sm:max-h-[620px] overflow-hidden rounded-2xl relative group bg-black/50 flex items-start justify-center">
+                            <img src="resource/images/App_Service/Section%201.png" alt="App Endpoint Section 1" class="w-full object-cover object-top cursor-zoom-in interactive" onclick="openLightbox(this.src)" onerror="this.onerror=null; this.src='resource/images/App_Service/Section-1.png';">
+                            <div class="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-mono text-brand-cyan border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-xl">
+                                <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to enlarge high-density blueprint
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">2. Granular Role-Based Security & Access Rules</h3>
+                    <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl overflow-hidden">
+                        <div class="max-h-[540px] sm:max-h-[620px] overflow-hidden rounded-2xl relative group bg-black/50 flex items-start justify-center">
+                            <img src="resource/images/App_Service/Security.png" alt="Security Settings Console" class="w-full object-cover object-top cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                            <div class="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-mono text-brand-cyan border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-xl">
+                                <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to enlarge high-density blueprint
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">3. Enterprise Cluster Settings & Sync Gateway Tuning</h3>
+                    <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl overflow-hidden">
+                        <div class="max-h-[540px] sm:max-h-[620px] overflow-hidden rounded-2xl relative group bg-black/50 flex items-start justify-center">
+                            <img src="resource/images/App_Service/settings.png" alt="General Settings Console" class="w-full object-cover object-top cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                            <div class="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-mono text-brand-cyan border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-xl">
+                                <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to enlarge high-density blueprint
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Business Impact & Outcomes -->
+        <section id="impact" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// MEASURABLE BUSINESS OUTCOMES</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-12">ROI & Enterprise Market Positioning</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">Weeks&rarr;Min</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Accelerated Onboarding</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Compressed developer setup from weeks of documentation review into guided self-service provisioning, accelerating time-to-value.</p>
+                    </div>
+
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">-15% Tickets</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Support Deflection</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Decreased configuration-related support escalations through proactive error boundaries and contextual syntax validation.</p>
+                    </div>
+
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">+Higher Paid Conv</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Enterprise Upgrades</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Simplified zero-server management proved to be a decisive differentiator in converting trial accounts to annual enterprise tier contracts.</p>
+                    </div>
+                </div>
+
+                <!-- Next Project Bottom Pager -->
+                <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                        <span class="text-xs font-mono text-gray-400 uppercase tracking-widest block mb-1">Next Case Study</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Couchbase Capella &middot; Day 0 Admin UX</h3>
+                        <p class="text-xs text-gray-400 mt-1">Accelerating Time-To-Value (TTV) &middot; DBaaS Admin Onboarding</p>
+                    </div>
+                    <a href="case-study-couchbase-day-0.html" class="bg-brand-cyan hover:bg-[#5935E8] text-white hover:text-white font-bold px-8 py-4 rounded-full transition-all flex items-center gap-3 text-sm font-mono tracking-wider interactive">
+                        <span>Read Next Case Study</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-white/10 text-center text-xs font-mono text-gray-500">
+        <p>&copy; 2024-2026 Rupak Biswas &middot; Senior Designer &middot; All Rights Reserved.</p>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 interactive">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl border border-white/10">
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        window.addEventListener('mousemove', (e) => {
+            cursorDot.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
+            
+            cursorGlow.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 250, fill: 'forwards' });
+        });
+
+        document.querySelectorAll('.interactive, a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+
+    <!-- ==========================================================================
+       INTERACTIVE AVATAR CONCIERGE & PORTFOLIO GUIDE (Case Study UX Walkthrough)
+       ========================================================================== -->
+    <div id="portfolio-guide-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-auto">
+        
+        <!-- Guide Dialogue / Routing Popover (Expandable) -->
+        <div id="guide-popover" onclick="event.stopPropagation()" class="w-80 sm:w-96 rounded-3xl border p-5 shadow-2xl mb-3 transition-all duration-300 transform origin-bottom-right scale-95 opacity-0 pointer-events-none backdrop-blur-2xl">
+            <!-- Popover Header -->
+            <div class="flex items-center justify-between pb-3 border-b guide-divider">
+                <div class="flex items-center gap-2.5">
+                    <div class="guide-headshot-frame w-8 h-8 rounded-full overflow-hidden border shadow-sm">
+                        <img src="Avatar-headshot.png" alt="Rupak Avatar" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='resource/images/rupak_avatar_headshot.png';">
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold flex items-center gap-1.5 guide-title">
+                            Rupak Biswas
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </h4>
+                        <span class="text-[10px] font-mono guide-subtitle">UX Guide & Concierge</span>
+                    </div>
+                </div>
+                <button type="button" onclick="closeGuidePopover(event)" class="guide-close-btn p-1.5 rounded-lg transition-colors interactive" title="Close Guide" aria-label="Close Guide">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Dynamic Guide Message & Screen-by-Screen Walkthrough -->
+            <div class="py-3.5">
+                <div class="p-3 rounded-2xl border guide-bubble-box">
+                    <p id="guide-speech-bubble" class="text-xs leading-relaxed">
+                        Welcome! Would you like me to walk you through this case study screen by screen like a Senior UX Director?
+                    </p>
+                </div>
+                <div id="guide-walkthrough-controls" class="mt-2">
+                    <button type="button" onclick="triggerGeminiScreenWalkthrough(event)" class="w-full py-2 px-3 rounded-xl guide-btn-primary font-bold text-xs font-mono transition-all flex items-center justify-center gap-1.5 shadow-sm interactive">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Start Screen-by-Screen Walkthrough</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fast Navigation Routes -->
+            <div class="space-y-1.5 pt-2 border-t guide-divider">
+                <span class="text-[9px] font-mono uppercase tracking-wider guide-section-label block px-1">Explore Other Blueprints</span>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <a href="case-study-corporate-banking.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">💳 Banking</a>
+                    <a href="case-study-oil-gas.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">⛽ Energy OS</a>
+                    <a href="case-study-tata-pay.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">📱 Tata Pay</a>
+                    <a href="case-study-couchbase-day-0.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">☁️ Couchbase</a>
+                </div>
+                <div class="pt-2">
+                    <a href="index.html" class="guide-btn-secondary w-full py-1.5 px-3 rounded-lg border text-[10px] font-mono transition-all text-center block interactive">
+                        &larr; Return to Executive Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Avatar Button Trigger -->
+        <button id="guide-avatar-trigger" type="button" aria-label="Toggle Ask Guide & Explore" class="relative group cursor-pointer block border-0 bg-transparent p-0 text-left outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan interactive" onclick="toggleGuidePopover(null, event)">
+            <div class="absolute -inset-2 rounded-full pulse-ring pointer-events-none"></div>
+            <div id="guide-badge-hint" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl hidden sm:flex items-center gap-2 group-hover:scale-105 transition-all pointer-events-none">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span>Explain Screens</span>
+            </div>
+            <div class="avatar-float relative w-16 h-16 sm:w-20 sm:h-20 guide-avatar-frame rounded-2xl p-1 border-2 transition-all overflow-hidden interactive">
+                <img src="Avatar.png" alt="Rupak Biswas - Guide Avatar" class="w-full h-full object-contain object-top transform group-hover:scale-105 transition-transform duration-300 pointer-events-none" onerror="this.onerror=null; this.src='resource/images/Avatar.png';">
+                <span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full guide-avatar-status-dot border-2 shadow-sm pointer-events-none"></span>
+            </div>
+        </button>
+    </div>
+
+
+    <!-- Guide Controller managed in avatar-guide.js (persists open until Close CTA is clicked) -->
+    <script src="avatar-guide.js?v=2.3.0"></script>
+
+</body>
+</html>

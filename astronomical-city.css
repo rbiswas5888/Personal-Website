@@ -1,0 +1,1089 @@
+/* ==========================================================================
+   INTELLIGENT ASTRONOMICAL CITY-VIEW WEBSITE LOADER
+   Rupak Biswas - Senior UX Designer Portfolio
+   - 100vw × 100vh Full-screen living vector city environment
+   - Real-time astronomical sky: Solar elevation, Lunar phase & NASA eclipse
+   - Foreground street, sidewalk, streetlights, trees, traffic & architecture
+   - 3-Layer parallax clouds, daytime flocking birds, night stars
+   - Responsive recomposition (Desktop, Tablet, Mobile)
+   - Seamless cinematic camera transition into portfolio (Light / Dark mode)
+   ========================================================================== */
+
+/* Fast instant-skip for repeat visits */
+html.skip-loader-instant #astro-city-loader {
+    display: none !important;
+}
+
+#astro-city-loader {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    perspective: 1200px;
+    background-color: #080811;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s ease;
+}
+
+body.astro-loader-active {
+    overflow: hidden !important;
+    height: 100vh !important;
+}
+
+/* --------------------------------------------------------------------------
+   Top HUD Bar & Telemetry Controls
+   -------------------------------------------------------------------------- */
+.astro-top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    gap: 1rem;
+    flex-wrap: wrap;
+    pointer-events: none;
+}
+
+.astro-telemetry-badge {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    background: rgba(13, 13, 18, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #F5F5F5;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+}
+
+.astro-status-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #6D4AFF;
+    box-shadow: 0 0 12px rgba(109, 74, 255, 0.8);
+    animation: astroPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes astroPulse {
+    0% { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.25); opacity: 1; }
+}
+
+.astro-city-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #FFFFFF;
+}
+
+.astro-phase-tag {
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(109, 74, 255, 0.25);
+    border: 1px solid rgba(109, 74, 255, 0.5);
+    color: #C9B8FF;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* Top Right Actions */
+.astro-actions {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.astro-debug-toggle-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.45rem 0.95rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    background: rgba(21, 21, 28, 0.8);
+    border: 1px solid rgba(139, 117, 255, 0.4);
+    color: #C9B8FF;
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.astro-debug-toggle-btn:hover {
+    background: rgba(109, 74, 255, 0.2);
+    border-color: #8B75FF;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+}
+
+.astro-skip-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.45rem 1.1rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #171717;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.astro-skip-btn:hover {
+    background: #FFFFFF;
+    color: #6D4AFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(109, 74, 255, 0.25);
+}
+
+.astro-go-back-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.45rem 1.15rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    background: #6D4AFF;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #FFFFFF;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(109, 74, 255, 0.45);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.astro-go-back-btn:hover {
+    background: #5935E8;
+    color: #FFFFFF;
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 6px 22px rgba(109, 74, 255, 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   Full-Screen Viewport Stage & Camera Dolly
+   -------------------------------------------------------------------------- */
+.city-viewport-stage {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    transform-origin: 50% 75%;
+    will-change: transform, opacity;
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+/* Transition to portfolio: Forward cinematic camera dolly */
+.city-camera-dolly-out {
+    transform: scale(2.4) translateY(-8%);
+    opacity: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Atmospheric Sky Layer (Continuous Astronomical Gradients)
+   -------------------------------------------------------------------------- */
+.city-sky-backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sky Themes based on Solar Elevation & Twilight */
+.sky-night {
+    background: linear-gradient(180deg, #05050C 0%, #0D0E1A 50%, #17182E 85%, #241D38 100%);
+}
+
+.sky-astronomical-twilight {
+    background: linear-gradient(180deg, #090B19 0%, #13172E 45%, #231C42 80%, #352554 100%);
+}
+
+.sky-nautical-dawn, .sky-nautical-dusk {
+    background: linear-gradient(180deg, #101633 0%, #201D48 45%, #462557 75%, #6B345E 100%);
+}
+
+.sky-civil-dawn, .sky-civil-dusk {
+    background: linear-gradient(180deg, #1A2352 0%, #3E2B63 40%, #7E3E64 70%, #B8585D 90%, #E88358 100%);
+}
+
+.sky-sunrise, .sky-sunset {
+    background: linear-gradient(180deg, #27376D 0%, #5C3D6D 35%, #A8495E 65%, #DE6849 85%, #F7A855 100%);
+}
+
+.sky-daylight {
+    background: linear-gradient(180deg, #3D82C4 0%, #5DA3DC 35%, #88C4EE 70%, #C3E2F8 90%, #EAF5FC 100%);
+}
+
+.sky-solar-noon {
+    background: linear-gradient(180deg, #2E78C2 0%, #519DE0 35%, #82C2F0 70%, #C8E5FA 90%, #F5FBFF 100%);
+}
+
+/* Solar Eclipse Sky State */
+.sky-solar-eclipse {
+    background: linear-gradient(180deg, #04050A 0%, #0F111D 40%, #1F192E 75%, #382436 100%) !important;
+}
+
+/* Lunar Eclipse Sky State */
+.sky-lunar-eclipse {
+    background: linear-gradient(180deg, #070409 0%, #140C18 50%, #251220 85%, #3B1A24 100%) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Celestial Sphere: Sun, Moon, Stars
+   -------------------------------------------------------------------------- */
+.city-celestial-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Night Stars */
+.celestial-stars-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+.sky-night .celestial-stars-layer,
+.sky-astronomical-twilight .celestial-stars-layer,
+.sky-nautical-dawn .celestial-stars-layer,
+.sky-nautical-dusk .celestial-stars-layer,
+.sky-solar-eclipse .celestial-stars-layer,
+.sky-lunar-eclipse .celestial-stars-layer {
+    opacity: 1;
+}
+
+.city-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    animation: starPulse 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes starPulse {
+    0% { opacity: 0.2; transform: scale(0.7); }
+    100% { opacity: 1; transform: scale(1.3); }
+}
+
+/* Sun Body */
+.celestial-sun-body {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #FFF5D0;
+    box-shadow: 
+        0 0 35px rgba(255, 235, 150, 0.8),
+        0 0 80px rgba(255, 195, 80, 0.45),
+        0 0 160px rgba(255, 170, 50, 0.2);
+    transform: translate(-50%, -50%);
+    will-change: left, top, opacity;
+    transition: left 0.8s ease, top 0.8s ease, opacity 0.8s ease;
+}
+
+/* Sun Rays / Atmospheric Flare */
+.celestial-sun-corona {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 235, 170, 0.15) 50%, transparent 70%);
+}
+
+/* Total Solar Eclipse Corona Ring */
+.solar-eclipse-active .celestial-sun-body {
+    background: #0D0D12 !important;
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.9),
+        0 0 50px rgba(180, 200, 255, 0.6),
+        0 0 100px rgba(109, 74, 255, 0.4) !important;
+}
+
+/* Moon Body & Precise Mathematical Vector SVG Phase */
+.celestial-moon-body {
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    transform: translate(-50%, -50%);
+    will-change: left, top, opacity;
+    transition: left 0.8s ease, top 0.8s ease, opacity 0.8s ease;
+    filter: drop-shadow(0 0 16px rgba(240, 240, 255, 0.45)) drop-shadow(0 0 45px rgba(139, 117, 255, 0.25));
+}
+
+#moon-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+#moon-lit-path {
+    transition: d 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), fill 0.4s ease;
+}
+
+/* Total Lunar Eclipse Blood Moon */
+.lunar-eclipse-active .celestial-moon-body {
+    filter: drop-shadow(0 0 25px rgba(230, 70, 50, 0.8)) drop-shadow(0 0 60px rgba(180, 40, 30, 0.5)) !important;
+}
+
+.lunar-eclipse-active #moon-lit-path {
+    fill: #D63031 !important;
+}
+
+/* --------------------------------------------------------------------------
+   3-Layer Parallax Clouds System
+   -------------------------------------------------------------------------- */
+.city-clouds-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.clouds-bg { z-index: 3; opacity: 0.65; }
+.clouds-mid { z-index: 5; opacity: 0.8; }
+.clouds-fg { z-index: 8; opacity: 0.95; }
+
+.cloud-cluster {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    will-change: transform;
+}
+
+.cloud-bubble {
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 50%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+/* Night cloud tint */
+.sky-night .cloud-bubble,
+.sky-astronomical-twilight .cloud-bubble {
+    background: rgba(36, 38, 56, 0.55);
+    box-shadow: none;
+}
+
+/* Parallax Cloud Drifts */
+.cloud-drift-slow {
+    animation: cloudDrift 95s linear infinite;
+}
+
+.cloud-drift-medium {
+    animation: cloudDrift 60s linear infinite;
+}
+
+.cloud-drift-fast {
+    animation: cloudDrift 38s linear infinite;
+}
+
+@keyframes cloudDrift {
+    0% { transform: translateX(-35vw); }
+    100% { transform: translateX(115vw); }
+}
+
+/* --------------------------------------------------------------------------
+   Daytime Birds Flocking System
+   -------------------------------------------------------------------------- */
+.city-birds-flock {
+    position: absolute;
+    top: 20%;
+    left: -10vw;
+    z-index: 6;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.sky-daylight .city-birds-flock,
+.sky-solar-noon .city-birds-flock,
+.sky-sunrise .city-birds-flock,
+.sky-civil-dawn .city-birds-flock {
+    opacity: 1;
+}
+
+.bird-flight-path {
+    animation: birdFlight 24s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes birdFlight {
+    0% { transform: translate(-10vw, 40px) scale(0.7); }
+    50% { transform: translate(60vw, -30px) scale(0.9); }
+    100% { transform: translate(115vw, 20px) scale(1.1); }
+}
+
+.bird-wing-flap {
+    display: inline-block;
+    animation: birdWing 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes birdWing {
+    0% { transform: scaleY(0.7) rotate(-10deg); }
+    100% { transform: scaleY(1.3) rotate(10deg); }
+}
+
+/* --------------------------------------------------------------------------
+   Vector Architecture Skyline (Background, Midground, Hero Towers)
+   -------------------------------------------------------------------------- */
+.city-skyline-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 75%;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+/* Background Skyline (Silhouettes) */
+.skyline-layer-bg {
+    position: absolute;
+    bottom: 18%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 60%;
+    z-index: 11;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 2vw;
+    opacity: 0.55;
+    filter: blur(0.5px);
+}
+
+.bg-tower {
+    background: #181E38;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: background 1.2s ease;
+}
+
+.sky-daylight .bg-tower,
+.sky-solar-noon .bg-tower {
+    background: #9DBFD8;
+}
+
+.sky-sunrise .bg-tower,
+.sky-sunset .bg-tower {
+    background: #734563;
+}
+
+/* Midground Modern Towers & Architecture */
+.skyline-layer-mid {
+    position: absolute;
+    bottom: 12%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 70%;
+    z-index: 14;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1.5vw;
+}
+
+.mid-building {
+    background: #151829;
+    border-radius: 6px 6px 0 0;
+    border-top: 2px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
+    transition: background 1.2s ease, border-color 1.2s ease;
+}
+
+.sky-daylight .mid-building,
+.sky-solar-noon .mid-building {
+    background: #DEE8F0;
+    border-top-color: #FFFFFF;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.sky-sunrise .mid-building,
+.sky-sunset .mid-building {
+    background: #87516F;
+    border-top-color: #FFB085;
+}
+
+/* Antenna with Red Blinking Aviation Light */
+.tower-spire-antenna {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 38px;
+    background: #888899;
+}
+
+.aviation-blinker {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #FF3344;
+    box-shadow: 0 0 10px #FF3344;
+    animation: aviationBlink 1.2s infinite steps(1);
+}
+
+@keyframes aviationBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Glowing Window Matrices */
+.window-grid {
+    display: grid;
+    gap: 4px;
+    padding: 8px 6px;
+    width: 100%;
+}
+
+.city-window {
+    height: 6px;
+    border-radius: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    transition: background 0.8s ease, box-shadow 0.8s ease;
+}
+
+/* Daytime Windows: Subtle Glass Reflection */
+.sky-daylight .city-window,
+.sky-solar-noon .city-window {
+    background: #BED1E2;
+}
+
+/* Nighttime Windows: Warm Illuminations */
+.sky-night .city-window.lit-warm,
+.sky-astronomical-twilight .city-window.lit-warm,
+.sky-nautical-dusk .city-window.lit-warm,
+.sky-solar-eclipse .city-window.lit-warm {
+    background: #FFEAA7;
+    box-shadow: 0 0 8px rgba(255, 234, 167, 0.8);
+}
+
+.sky-night .city-window.lit-violet,
+.sky-astronomical-twilight .city-window.lit-violet {
+    background: #C9B8FF;
+    box-shadow: 0 0 8px rgba(201, 184, 255, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   Foreground Street, Sidewalk, Streetlights & Traffic
+   -------------------------------------------------------------------------- */
+.city-foreground-street {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 18%;
+    z-index: 20;
+    background: #10121C;
+    border-top: 3px solid #282C40;
+    transition: background 1.2s ease, border-color 1.2s ease;
+}
+
+.sky-daylight .city-foreground-street,
+.sky-solar-noon .city-daylight .city-foreground-street {
+    background: #E8E7E3;
+    border-top-color: #D4D2CA;
+}
+
+/* Sidewalk & Curb */
+.city-sidewalk {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 28%;
+    background: #171926;
+    border-bottom: 2px solid #2D3248;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4vw;
+}
+
+.sky-daylight .city-sidewalk,
+.sky-solar-noon .city-sidewalk {
+    background: #F2F1ED;
+    border-bottom-color: #DDD9CF;
+}
+
+/* Streetlights with Nighttime Volumetric Light Beams */
+.street-lamp-post {
+    position: relative;
+    width: 6px;
+    height: 48px;
+    background: #44475A;
+    border-radius: 2px 2px 0 0;
+    margin-top: -38px;
+}
+
+.lamp-head {
+    position: absolute;
+    top: -4px;
+    left: -6px;
+    width: 18px;
+    height: 6px;
+    background: #252838;
+    border-radius: 3px;
+}
+
+.lamp-bulb {
+    position: absolute;
+    bottom: -2px;
+    left: 3px;
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+    background: #666;
+    transition: background 0.8s ease, box-shadow 0.8s ease;
+}
+
+.lamp-light-cone {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 80px;
+    clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);
+    background: linear-gradient(180deg, rgba(255, 235, 160, 0.45) 0%, rgba(255, 235, 160, 0.02) 85%, transparent 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
+/* Streetlights turn on at Sunset / Night */
+.sky-night .lamp-bulb,
+.sky-civil-dusk .lamp-bulb,
+.sky-nautical-dusk .lamp-bulb,
+.sky-astronomical-twilight .lamp-bulb,
+.sky-solar-eclipse .lamp-bulb {
+    background: #FFEAA7;
+    box-shadow: 0 0 16px rgba(255, 234, 167, 0.9);
+}
+
+.sky-night .lamp-light-cone,
+.sky-civil-dusk .lamp-light-cone,
+.sky-nautical-dusk .lamp-light-cone,
+.sky-astronomical-twilight .lamp-light-cone,
+.sky-solar-eclipse .lamp-light-cone {
+    opacity: 1;
+}
+
+/* Urban Trees along Sidewalk */
+.street-tree {
+    position: relative;
+    width: 32px;
+    height: 52px;
+    margin-top: -42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tree-canopy {
+    width: 32px;
+    height: 36px;
+    border-radius: 50% 50% 45% 45%;
+    background: #142820;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background 1s ease;
+}
+
+.sky-daylight .tree-canopy,
+.sky-solar-noon .tree-canopy {
+    background: #4C8C58;
+}
+
+.tree-trunk {
+    width: 4px;
+    height: 16px;
+    background: #3B2A1E;
+    border-radius: 1px;
+}
+
+/* Road Lane & Crosswalk Markings */
+.city-road-surface {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.road-centerline-dashes {
+    width: 100%;
+    height: 3px;
+    background: repeating-linear-gradient(
+        to right,
+        #444963 0px,
+        #444963 28px,
+        transparent 28px,
+        transparent 56px
+    );
+}
+
+.sky-daylight .road-centerline-dashes,
+.sky-solar-noon .road-centerline-dashes {
+    background: repeating-linear-gradient(
+        to right,
+        #FFFFFF 0px,
+        #FFFFFF 28px,
+        transparent 28px,
+        transparent 56px
+    );
+}
+
+/* Crosswalk Zebra Stripes */
+.crosswalk-stripes {
+    position: absolute;
+    right: 15%;
+    width: 80px;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.crosswalk-stripe {
+    width: 8px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.sky-daylight .crosswalk-stripe,
+.sky-solar-noon .crosswalk-stripe {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+/* Moving Traffic (Car Headlights & Taillights) */
+.traffic-vehicle {
+    position: absolute;
+    bottom: 22%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    will-change: transform;
+}
+
+.car-eastbound {
+    animation: trafficEast 16s linear infinite;
+}
+
+.car-westbound {
+    animation: trafficWest 19s linear infinite;
+    bottom: 50%;
+}
+
+@keyframes trafficEast {
+    0% { transform: translateX(-15vw); }
+    100% { transform: translateX(115vw); }
+}
+
+@keyframes trafficWest {
+    0% { transform: translateX(115vw); }
+    100% { transform: translateX(-15vw); }
+}
+
+.headlight-beam {
+    width: 45px;
+    height: 12px;
+    clip-path: polygon(0% 40%, 100% 0%, 100% 100%, 0% 60%);
+    background: linear-gradient(90deg, rgba(255, 245, 200, 0.8) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.taillight-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #FF2A2A;
+    box-shadow: 0 0 8px #FF2A2A;
+}
+
+.sky-night .headlight-beam,
+.sky-astronomical-twilight .headlight-beam,
+.sky-civil-dusk .headlight-beam,
+.sky-nautical-dusk .headlight-beam,
+.sky-solar-eclipse .headlight-beam {
+    opacity: 0.85;
+}
+
+/* --------------------------------------------------------------------------
+   Contextual Status Loading Message (Bottom Center)
+   -------------------------------------------------------------------------- */
+.astro-status-container {
+    position: absolute;
+    bottom: 2.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.astro-context-message {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #F5F5F5;
+    background: rgba(13, 13, 18, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 0.45rem 1.1rem;
+    border-radius: 9999px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.sky-daylight .astro-context-message,
+.sky-solar-noon .astro-context-message {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #171717;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.astro-progress-bar-track {
+    width: 160px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.sky-daylight .astro-progress-bar-track,
+.sky-solar-noon .astro-progress-bar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.astro-progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #6D4AFF;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(109, 74, 255, 0.8);
+    transition: width 0.3s ease;
+}
+
+/* --------------------------------------------------------------------------
+   Developer Astronomical Lab / Debug Drawer
+   -------------------------------------------------------------------------- */
+.astro-debug-drawer {
+    position: absolute;
+    top: 5rem;
+    right: 2rem;
+    width: 320px;
+    max-width: calc(100vw - 4rem);
+    background: rgba(16, 17, 24, 0.94);
+    border: 1px solid rgba(139, 117, 255, 0.35);
+    border-radius: 12px;
+    padding: 1.25rem;
+    color: #F0F0F5;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    z-index: 120;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    gap: 0.85rem;
+    user-select: text;
+}
+
+.astro-debug-drawer.is-open {
+    display: flex;
+}
+
+.debug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+    font-weight: 700;
+    color: #C9B8FF;
+}
+
+.debug-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.debug-label {
+    font-size: 0.65rem;
+    color: #85859E;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.debug-slider {
+    width: 100%;
+    accent-color: #6D4AFF;
+    cursor: pointer;
+}
+
+.debug-btn-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+}
+
+.debug-preset-btn {
+    padding: 0.35rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    color: #DDD;
+    font-size: 0.65rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+}
+
+.debug-preset-btn:hover {
+    background: #6D4AFF;
+    color: #FFF;
+    border-color: #6D4AFF;
+}
+
+.debug-select {
+    width: 100%;
+    background: #11121A;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #EEE;
+    padding: 0.35rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.7rem;
+}
+
+.debug-telemetry-readout {
+    background: #0A0B10;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.65rem;
+    line-height: 1.4;
+    color: #A0A0BA;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Viewport Recomposition
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .astro-top-bar {
+        padding: 1rem;
+    }
+
+    .astro-telemetry-badge {
+        font-size: 0.65rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    /* Mobile vertical recomposition: Elevate hero tower & clear upper sky */
+    .skyline-layer-mid {
+        gap: 2.5vw;
+        height: 65%;
+    }
+
+    .skyline-layer-bg {
+        height: 50%;
+    }
+
+    .street-lamp-post:nth-child(even) {
+        display: none;
+    }
+
+    .street-tree:nth-child(3n) {
+        display: none;
+    }
+
+    .astro-status-container {
+        bottom: 1.5rem;
+    }
+
+    .astro-context-message {
+        font-size: 0.65rem;
+        padding: 0.35rem 0.85rem;
+    }
+
+    .astro-debug-drawer {
+        top: 4.5rem;
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+    }
+}
+
+/* Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+    #astro-city-loader {
+        transition: opacity 0.2s ease;
+    }
+    .cloud-drift-slow,
+    .cloud-drift-medium,
+    .cloud-drift-fast,
+    .bird-flight-path,
+    .bird-wing-flap,
+    .car-eastbound,
+    .car-westbound,
+    .city-star {
+        animation: none !important;
+    }
+}

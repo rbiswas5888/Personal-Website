@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Automotive ERP & Warehouse Management System (WMS) Case Study - Supply Chain UX Architecture by Rupak Biswas">
+    <meta name="robots" content="noarchive, noimageindex">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <title>Automotive ERP WMS | Supply Chain Architecture — Rupak Biswas</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00f0ff',
+                            accent: '#38bdf8',
+                            amber: '#f59e0b',
+                        },
+                        dark: {
+                            950: '#040406',
+                            900: '#070709',
+                            800: '#0f0f14',
+                            700: '#181820',
+                            600: '#23232f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070709;
+            --card-glass-bg: rgba(18, 18, 24, 0.65);
+            --card-glass-border: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f0ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: none;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor-dot, #cursor-glow { display: none !important; }
+        }
+
+        #cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.15s ease, height 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1px solid rgba(0, 240, 255, 0.5);
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+        }
+
+        body.cursor-hover #cursor-dot {
+            width: 12px; height: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        body.cursor-hover #cursor-glow {
+            width: 56px; height: 56px;
+            border-color: rgba(0, 240, 255, 0.9);
+            background-color: rgba(0, 240, 255, 0.12);
+            backdrop-filter: blur(2px);
+        }
+
+        .glass-panel {
+            background: var(--card-glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-glass-border);
+        }
+
+        .glass-card {
+            background: rgba(22, 22, 30, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px -10px rgba(0, 240, 255, 0.15);
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="theme-and-guide.css?v=2.3.0">
+</head>
+
+<body class="selection:bg-brand-cyan/20 selection:text-brand-cyan">
+    <div id="cursor-dot"></div>
+    <div id="cursor-glow"></div>
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group interactive">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform text-brand-cyan"></i>
+                    <span class="text-xs font-mono tracking-wider uppercase font-semibold">Back to Portfolio</span>
+                </a>
+                <span class="hidden sm:inline-block text-white/20">|</span>
+                <span class="hidden sm:inline-block text-xs font-mono text-gray-400">Tekion &middot; Auto Parts ERP</span>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-6 text-xs font-mono text-gray-400">
+                <a href="#overview" class="hover:text-brand-cyan transition-colors interactive">Overview</a>
+                <a href="#mechanisms" class="hover:text-brand-cyan transition-colors interactive">WMS Engine</a>
+                <a href="#research" class="hover:text-brand-cyan transition-colors interactive">Field Research</a>
+                <a href="#screens" class="hover:text-brand-cyan transition-colors interactive">UI Journey</a>
+                <a href="#impact" class="hover:text-brand-cyan transition-colors interactive">Impact</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="resource/images/Resume_Rupak_Biswas.pdf" target="_blank" class="glass-card px-3.5 py-1.5 rounded-full text-xs font-mono text-gray-200 hover:text-brand-cyan flex items-center gap-1.5 interactive">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span>Resume</span>
+                </a>
+                <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:border-brand-cyan transition-all interactive" title="Toggle Light / Dark Mode">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-400"></i>
+                </button>
+                <a href="mailto:contact@rupak-biswas.com" class="bg-brand-cyan/10 hover:bg-brand-cyan hover:text-white border border-brand-cyan/30 text-brand-cyan text-xs font-mono font-medium px-4 py-1.5 rounded-full transition-all interactive">
+                    Inquire
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-28 pb-20">
+        <!-- Hero Section -->
+        <section id="overview" class="px-6 max-w-7xl mx-auto pt-10 pb-16">
+            <div class="reveal-on-scroll">
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <span class="px-3 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono font-semibold">SUPPLY CHAIN & LOGISTICS</span>
+                    <span class="px-3 py-1 rounded-md bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-xs font-mono">AUTOMOTIVE ERP / WMS</span>
+                    <span class="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-xs font-mono">HIGH-CONCURRENCY FLOOR LOGISTICS</span>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
+                    Automotive ERP: <br>
+                    <span class="text-brand-cyan">
+                        Warehouse Management OS.
+                    </span>
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-gray-300 font-light max-w-4xl leading-relaxed mb-12">
+                    Architected a high-throughput Warehouse Management System (WMS) tailored for automotive parts distribution networks. Bridged rigid legacy mainframe terminals with modern, touch-optimized interfaces to automate inventory allocation, container tracking, and First-In, First-Out (FIFO) dispatches.
+                </p>
+
+                <!-- KPI Strip -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Market TAM Growth</span>
+                        <span class="text-3xl font-bold text-white font-mono text-brand-cyan">15% CAGR</span>
+                        <span class="block text-xs text-gray-400 mt-1">$7Bn sector expansion</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Scan Errors</span>
+                        <span class="text-3xl font-bold text-white font-mono">-22%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Barcode scanning mistakes</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Legacy Bridge</span>
+                        <span class="text-3xl font-bold text-white font-mono">AS400</span>
+                        <span class="block text-xs text-gray-400 mt-1">Zero backend overhaul</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Role</span>
+                        <span class="text-2xl font-bold text-white font-mono">Lead UX</span>
+                        <span class="block text-xs text-gray-400 mt-1">Product Architect</span>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="glass-panel rounded-3xl overflow-hidden p-2 sm:p-4 border border-white/10 shadow-2xl relative group">
+                    <img src="resource/images/tekion/Group%201.png" alt="Automotive ERP WMS Dashboard Preview" 
+                         class="w-full h-auto rounded-2xl object-cover cursor-zoom-in interactive"
+                         onclick="openLightbox(this.src)"
+                         onerror="this.src='resource/images/Automotive_Warehouse.png'">
+                    <div class="absolute bottom-6 right-6 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-[11px] font-mono text-gray-300 pointer-events-none">
+                        Click to enlarge warehouse console
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Metadata Table -->
+        <section class="border-y border-white/10 bg-black/40 py-10 px-6 mb-20">
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Domain</span>
+                    <strong class="text-white text-sm">Automobile Logistics & ERP Integration</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">My Role</span>
+                    <strong class="text-white text-sm">Lead UX Designer & Systems Architect</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Hardware & Tech</span>
+                    <strong class="text-white text-sm">RFID Scanners, Rugged Tablets, AS400 Sync</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Core Workflows</span>
+                    <strong class="text-white text-sm">FIFO Dispatch, QA Rebooking, Inventory Ledger</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Problem Area & Objectives -->
+        <section class="px-6 max-w-7xl mx-auto py-16">
+            <div class="reveal-on-scroll grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest">// THE BOTTLENECK</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Eradicating Blindspots in High-Velocity Auto Parts Yards</h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        In the automotive aftermarket, receivers and parts dealership managers were unable to view the specific contents of incoming freight containers before they arrived at the dock. This created severe staging bottlenecks, stock disorganization, and accounting ledger discrepancies.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Additionally, QA inspections repeatedly ground fulfillment lines to a halt. The objective was to design a comprehensive system providing complete parts traceability from inbound container arrival to technician dispatch.
+                    </p>
+
+                    <div class="space-y-3 pt-2">
+                        <div class="glass-card rounded-xl p-4 flex gap-3 items-center">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-brand-cyan flex-shrink-0"></i>
+                            <span class="text-xs text-gray-300">Rebooking & tote allocation configured to customer repair orders</span>
+                        </div>
+                        <div class="glass-card rounded-xl p-4 flex gap-3 items-center">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-brand-cyan flex-shrink-0"></i>
+                            <span class="text-xs text-gray-300">Advance shipping container visibility for dock receivers</span>
+                        </div>
+                        <div class="glass-card rounded-xl p-4 flex gap-3 items-center">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-brand-cyan flex-shrink-0"></i>
+                            <span class="text-xs text-gray-300">Automated First-In, First-Out (FIFO) stock dispatch rules</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="glass-card rounded-3xl p-3 overflow-hidden border border-white/10">
+                        <img src="resource/images/tekion/Journey%20-%20Main%20warehouse.png" alt="Warehouse Journey Map" class="w-full rounded-2xl object-cover cursor-zoom-in interactive" onclick="openLightbox(this.src)" onerror="this.onerror=null; this.src='resource/images/tekion/Journey-Main-warehouse.png';">
+                        <p class="text-[11px] font-mono text-gray-400 text-center py-2">End-to-End Main Warehouse Fulfillment Journey</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WMS Mechanisms Grid -->
+        <section id="mechanisms" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// FUNCTIONING MECHANISM</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">The Core WMS Operational Engine</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">Automating reception, storage allocation, bin navigation, picking routing, and demand planning.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal-on-scroll">
+                <div class="glass-card rounded-3xl p-6">
+                    <div class="w-10 h-10 rounded-xl bg-brand-cyan/10 text-brand-cyan flex items-center justify-center mb-4">
+                        <i data-lucide="package-check" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Dynamic Order Routing</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Automatically allocates inventory in real time and calculates optimized shortest-path walking routes for warehouse pickers.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
+                        <i data-lucide="radio" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">RFID & Scanner Telemetry</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Integrated real-time RFID tracking and barcode scanning, alerting floor operators to stock misplacements instantaneously.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">In-Line Quality Assurance</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Automated defect inspection alerts during receiving, routing damaged components to return queues without stalling healthy pallets.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4">
+                        <i data-lucide="truck" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Automated Dispatch & FIFO</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Enforces First-In First-Out inventory dispatch, automatically generating carrier documentation and hazardous materials manifests.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-4">
+                        <i data-lucide="repeat" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">Continuous Cycle Counting</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Scheduled micro-counts reconcile inventory discrepancies without shutting down active warehouse zones.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6">
+                    <div class="w-10 h-10 rounded-xl bg-brand-cyan/10 text-brand-cyan flex items-center justify-center mb-4">
+                        <i data-lucide="database" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">AS400 Mainframe Bridge</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Constructed a modern UX layer that synchronized seamlessly with legacy AS400 green-screen databases, avoiding millions in migration debt.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ethnographic Field Research -->
+        <section id="research" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// ETHNOGRAPHIC RESEARCH</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">On-the-Floor Field Shadowing</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">
+                    Conducted on-site ethnographic shadowing in active US & EU logistics hubs to uncover real-world workarounds and ergonomics under high physical stress.
+                </p>
+            </div>
+
+            <!-- 2-col Research and IA -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 reveal-on-scroll">
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-2">Requirement Analysis & Parts Categorization</h4>
+                        <p class="text-xs text-gray-400 mb-4">Mapping space allocation, bin capacities, and technician requisition habits.</p>
+                    </div>
+                    <div class="h-72 sm:h-80 md:h-96 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/60 flex items-center justify-center p-2">
+                        <img src="resource/images/tekion/345.png" alt="Requirement Analysis" class="max-h-full max-w-full object-contain cursor-zoom-in interactive hover:scale-[1.02] transition-transform" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-2">Supply Chain Information Architecture</h4>
+                        <p class="text-xs text-gray-400 mb-4">Multi-tier taxonomy covering parts settings, dealership inventory, and RO sales.</p>
+                    </div>
+                    <div class="h-72 sm:h-80 md:h-96 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/60 flex items-center justify-center p-2">
+                        <img src="resource/images/tekion/IA.png" alt="Information Architecture" class="max-h-full max-w-full object-contain cursor-zoom-in interactive hover:scale-[1.02] transition-transform" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11-step simplification framework -->
+            <div class="glass-card rounded-3xl p-8 border border-white/10 reveal-on-scroll">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">11-Step Task Simplification Framework</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs font-mono">
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">01</span>
+                        <span class="text-gray-300">Enterprise Configurations</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">02</span>
+                        <span class="text-gray-300">Parts Settings</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">03</span>
+                        <span class="text-gray-300">Warehouse Indication</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">04</span>
+                        <span class="text-gray-300">Warehouse-Level Inventory</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">05</span>
+                        <span class="text-gray-300">Dealership Inventory</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">06</span>
+                        <span class="text-gray-300">Document Sequence Number</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">07</span>
+                        <span class="text-gray-300">PO & Receiving</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">08</span>
+                        <span class="text-gray-300">Parts RO Sales</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">09</span>
+                        <span class="text-gray-300">Audit Reporting</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">10</span>
+                        <span class="text-gray-300">Performance Analytics</span>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-xl flex items-center gap-3">
+                        <span class="text-brand-cyan font-bold">11</span>
+                        <span class="text-gray-300">Data Migration</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- UI & Production Screens -->
+        <section id="screens" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// PRODUCTION OUTPUT</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">The Deployed Floor Experience</h2>
+            </div>
+
+            <div class="space-y-12 reveal-on-scroll">
+                <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl">
+                    <img src="resource/images/tekion/Non%20Admin%20view%20in%20list%20and%20detail%20page.png" alt="WMS Non Admin List and Detail View" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)" onerror="this.onerror=null; this.src='resource/images/tekion/Non-Admin-view-in-list-and-detail-page.png';">
+                    <p class="text-[11px] font-mono text-gray-400 text-center py-2">Role-Based Floor Operator View (High Contrast)</p>
+                </div>
+
+                <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl">
+                    <img src="resource/images/tekion/Frame%2026086607.png" alt="WMS Interactive Flow Screen" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)" onerror="this.onerror=null; this.src='resource/images/tekion/Frame-26086607.png';">
+                    <p class="text-[11px] font-mono text-gray-400 text-center py-2">Detailed Part Metadata & Dispatch Ledger</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Impact & Return to Portfolio -->
+        <section id="impact" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// OPERATIONAL ROI</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-12">Measured Financial Outcomes</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">-22%</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Scan Error Drop</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">High-contrast feedback loops and audio cues reduced misplaced parts and double scans.</p>
+                    </div>
+
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">Zero</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Backend Mainframe Disruption</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">The modular frontend preserved underlying AS400 core business logic, avoiding millions in system migrations.</p>
+                    </div>
+
+                    <div class="glass-card rounded-3xl p-8">
+                        <div class="text-4xl font-bold font-mono text-brand-cyan mb-2">+35%</div>
+                        <h4 class="text-lg font-bold text-white mb-2">Receiving Throughput</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Advance container visibility eliminated dock queuing, speeding parts from container to shelf in record time.</p>
+                    </div>
+                </div>
+
+                <!-- Back to Portfolio Hub -->
+                <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                        <span class="text-xs font-mono text-gray-400 uppercase tracking-widest block mb-1">Portfolio Complete</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Explore All Case Studies & Methodology</h3>
+                        <p class="text-xs text-gray-400 mt-1">Review the executive summary, resume, and contact Rupak Biswas</p>
+                    </div>
+                    <a href="index.html" class="bg-brand-cyan hover:bg-[#5935E8] text-white hover:text-white font-bold px-8 py-4 rounded-full transition-all flex items-center gap-3 text-sm font-mono tracking-wider interactive">
+                        <span>Return to Main Portfolio</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-white/10 text-center text-xs font-mono text-gray-500">
+        <p>&copy; 2024-2026 Rupak Biswas &middot; Senior Designer &middot; All Rights Reserved.</p>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 interactive">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl border border-white/10">
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        window.addEventListener('mousemove', (e) => {
+            cursorDot.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
+            
+            cursorGlow.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 250, fill: 'forwards' });
+        });
+
+        document.querySelectorAll('.interactive, a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+
+    <!-- ==========================================================================
+       INTERACTIVE AVATAR CONCIERGE & PORTFOLIO GUIDE (Case Study UX Walkthrough)
+       ========================================================================== -->
+    <div id="portfolio-guide-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-auto">
+        
+        <!-- Guide Dialogue / Routing Popover (Expandable) -->
+        <div id="guide-popover" onclick="event.stopPropagation()" class="w-80 sm:w-96 rounded-3xl border p-5 shadow-2xl mb-3 transition-all duration-300 transform origin-bottom-right scale-95 opacity-0 pointer-events-none backdrop-blur-2xl">
+            <!-- Popover Header -->
+            <div class="flex items-center justify-between pb-3 border-b guide-divider">
+                <div class="flex items-center gap-2.5">
+                    <div class="guide-headshot-frame w-8 h-8 rounded-full overflow-hidden border shadow-sm">
+                        <img src="Avatar-headshot.png" alt="Rupak Avatar" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='resource/images/rupak_avatar_headshot.png';">
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold flex items-center gap-1.5 guide-title">
+                            Rupak Biswas
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </h4>
+                        <span class="text-[10px] font-mono guide-subtitle">UX Guide & Concierge</span>
+                    </div>
+                </div>
+                <button type="button" onclick="closeGuidePopover(event)" class="guide-close-btn p-1.5 rounded-lg transition-colors interactive" title="Close Guide" aria-label="Close Guide">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Dynamic Guide Message & Screen-by-Screen Walkthrough -->
+            <div class="py-3.5">
+                <div class="p-3 rounded-2xl border guide-bubble-box">
+                    <p id="guide-speech-bubble" class="text-xs leading-relaxed">
+                        Welcome! Would you like me to walk you through this case study screen by screen like a Senior UX Director?
+                    </p>
+                </div>
+                <div id="guide-walkthrough-controls" class="mt-2">
+                    <button type="button" onclick="triggerGeminiScreenWalkthrough(event)" class="w-full py-2 px-3 rounded-xl guide-btn-primary font-bold text-xs font-mono transition-all flex items-center justify-center gap-1.5 shadow-sm interactive">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Start Screen-by-Screen Walkthrough</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fast Navigation Routes -->
+            <div class="space-y-1.5 pt-2 border-t guide-divider">
+                <span class="text-[9px] font-mono uppercase tracking-wider guide-section-label block px-1">Explore Other Blueprints</span>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <a href="case-study-corporate-banking.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">💳 Banking</a>
+                    <a href="case-study-oil-gas.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">⛽ Energy OS</a>
+                    <a href="case-study-tata-pay.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">📱 Tata Pay</a>
+                    <a href="case-study-couchbase-day-0.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">☁️ Couchbase</a>
+                </div>
+                <div class="pt-2">
+                    <a href="index.html" class="guide-btn-secondary w-full py-1.5 px-3 rounded-lg border text-[10px] font-mono transition-all text-center block interactive">
+                        &larr; Return to Executive Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Avatar Button Trigger -->
+        <button id="guide-avatar-trigger" type="button" aria-label="Toggle Ask Guide & Explore" class="relative group cursor-pointer block border-0 bg-transparent p-0 text-left outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan interactive" onclick="toggleGuidePopover(null, event)">
+            <div class="absolute -inset-2 rounded-full pulse-ring pointer-events-none"></div>
+            <div id="guide-badge-hint" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl hidden sm:flex items-center gap-2 group-hover:scale-105 transition-all pointer-events-none">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span>Explain Screens</span>
+            </div>
+            <div class="avatar-float relative w-16 h-16 sm:w-20 sm:h-20 guide-avatar-frame rounded-2xl p-1 border-2 transition-all overflow-hidden interactive">
+                <img src="Avatar.png" alt="Rupak Biswas - Guide Avatar" class="w-full h-full object-contain object-top transform group-hover:scale-105 transition-transform duration-300 pointer-events-none" onerror="this.onerror=null; this.src='resource/images/Avatar.png';">
+                <span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full guide-avatar-status-dot border-2 shadow-sm pointer-events-none"></span>
+            </div>
+        </button>
+    </div>
+
+
+    <!-- Guide Controller managed in avatar-guide.js (persists open until Close CTA is clicked) -->
+    <script src="avatar-guide.js?v=2.3.0"></script>
+
+</body>
+</html>

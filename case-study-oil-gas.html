@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="ExxonMobil & Deloitte Global Energy Commerce OS Case Study - UX Architecture & Rules Engine by Rupak Biswas">
+    <meta name="robots" content="noarchive, noimageindex">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <title>Global Energy Commerce OS | ExxonMobil & Deloitte — Rupak Biswas</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00f0ff',
+                            accent: '#38bdf8',
+                            blue: '#2563eb',
+                        },
+                        dark: {
+                            950: '#040406',
+                            900: '#070709',
+                            800: '#0f0f14',
+                            700: '#181820',
+                            600: '#23232f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070709;
+            --card-glass-bg: rgba(18, 18, 24, 0.65);
+            --card-glass-border: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f0ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: none;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor-dot, #cursor-glow { display: none !important; }
+        }
+
+        /* Dual-layer interactive cursor */
+        #cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.15s ease, height 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1px solid rgba(0, 240, 255, 0.5);
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+        }
+
+        body.cursor-hover #cursor-dot {
+            width: 12px; height: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        body.cursor-hover #cursor-glow {
+            width: 56px; height: 56px;
+            border-color: rgba(0, 240, 255, 0.9);
+            background-color: rgba(0, 240, 255, 0.12);
+            backdrop-filter: blur(2px);
+        }
+
+        .glass-panel {
+            background: var(--card-glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-glass-border);
+        }
+
+        .glass-card {
+            background: rgba(22, 22, 30, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px -10px rgba(0, 240, 255, 0.15);
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Lightbox modal */
+        #lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="theme-and-guide.css?v=2.3.0">
+</head>
+
+<body class="selection:bg-brand-cyan/20 selection:text-brand-cyan">
+    <!-- Custom Dual-Layer Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-glow"></div>
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group interactive">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform text-brand-cyan"></i>
+                    <span class="text-xs font-mono tracking-wider uppercase font-semibold">Back to Portfolio</span>
+                </a>
+                <span class="hidden sm:inline-block text-white/20">|</span>
+                <span class="hidden sm:inline-block text-xs font-mono text-gray-400">ExxonMobil / Deloitte</span>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-6 text-xs font-mono text-gray-400">
+                <a href="#overview" class="hover:text-brand-cyan transition-colors interactive">Overview</a>
+                <a href="#strategy" class="hover:text-brand-cyan transition-colors interactive">Strategy</a>
+                <a href="#rules-engine" class="hover:text-brand-cyan transition-colors interactive">Rules Engine</a>
+                <a href="#governance" class="hover:text-brand-cyan transition-colors interactive">Governance</a>
+                <a href="#screens" class="hover:text-brand-cyan transition-colors interactive">Architecture</a>
+                <a href="#roi" class="hover:text-brand-cyan transition-colors interactive">ROI</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="resource/images/Resume_Rupak_Biswas.pdf" target="_blank" class="glass-card px-3.5 py-1.5 rounded-full text-xs font-mono text-gray-200 hover:text-brand-cyan flex items-center gap-1.5 interactive">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span>Resume</span>
+                </a>
+                <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:border-brand-cyan transition-all interactive" title="Toggle Light / Dark Mode">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-400"></i>
+                </button>
+                <a href="mailto:contact@rupak-biswas.com" class="bg-brand-cyan/10 hover:bg-brand-cyan hover:text-white border border-brand-cyan/30 text-brand-cyan text-xs font-mono font-medium px-4 py-1.5 rounded-full transition-all interactive">
+                    Request Deck
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-28 pb-20">
+        <!-- Hero Section -->
+        <section id="overview" class="px-6 max-w-7xl mx-auto pt-10 pb-16">
+            <div class="reveal-on-scroll">
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <span class="px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono font-semibold">GLOBAL ENERGY OS</span>
+                    <span class="px-3 py-1 rounded-md bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-xs font-mono">RULES ENGINE &middot; 25 LANGUAGES</span>
+                    <span class="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-gray-300 text-xs font-mono">EXXONMOBIL &middot; DELOITTE DIGITAL</span>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
+                    Orchestrating Global <br>
+                    <span class="text-brand-cyan">
+                        Energy Commerce.
+                    </span>
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-gray-300 font-light max-w-4xl leading-relaxed mb-12">
+                    Scaled a unified B2B commerce ecosystem for ExxonMobil across 100+ nations. Defended market share and eradicated regional back-office bottlenecks by designing an automated business rules-engine with zero-fault tolerance for high-stakes multinational transactions.
+                </p>
+
+                <!-- KPI Strip -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Market Reach</span>
+                        <span class="text-3xl font-bold text-white font-mono text-brand-cyan">100+</span>
+                        <span class="block text-xs text-gray-400 mt-1">Countries deployed</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Acquisition Lift</span>
+                        <span class="text-3xl font-bold text-white font-mono">+22%</span>
+                        <span class="block text-xs text-gray-400 mt-1">YoY digital onboarding</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Latency Reduction</span>
+                        <span class="text-3xl font-bold text-white font-mono">-40%</span>
+                        <span class="block text-xs text-gray-400 mt-1">Order processing speed</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 text-center">
+                        <span class="block text-[11px] font-mono text-gray-400 uppercase tracking-widest mb-1">Team Led</span>
+                        <span class="text-2xl font-bold text-white font-mono">15+</span>
+                        <span class="block text-xs text-gray-400 mt-1">Designers & researchers</span>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="glass-panel rounded-3xl overflow-hidden p-2 sm:p-4 border border-white/10 shadow-2xl relative group">
+                    <img src="resource/images/oil-gas/hero_1.png" alt="ExxonMobil Global Order Management OS" 
+                         class="w-full h-auto rounded-2xl object-cover cursor-zoom-in interactive"
+                         onclick="openLightbox(this.src)"
+                         onerror="this.src='resource/images/oil-gas/hero_1.png'">
+                    <div class="absolute bottom-6 right-6 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-[11px] font-mono text-gray-300 pointer-events-none">
+                        Click to enlarge platform overview
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Metadata Table -->
+        <section class="border-y border-white/10 bg-black/40 py-10 px-6 mb-20">
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Client & Partner</span>
+                    <strong class="text-white text-sm">ExxonMobil / Deloitte Digital</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">My Role</span>
+                    <strong class="text-white text-sm">Lead UX Architect & Cross-Matrix Lead</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Scope & Scale</span>
+                    <strong class="text-white text-sm">100+ Nations &middot; 25 Languages (with RTL)</strong>
+                </div>
+                <div>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest block mb-1">Core Architecture</span>
+                    <strong class="text-white text-sm">Rules Engine &middot; Global Wholesaler Self-Service</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Strategic Mandate -->
+        <section id="strategy" class="px-6 max-w-7xl mx-auto py-16">
+            <div class="reveal-on-scroll grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest">// THE STRATEGIC MANDATE</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Defending Market Share Through Digital Agility.</h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        ExxonMobil faced a critical defensive challenge: regional fragmentation and manual "back-office" bottlenecks were significantly slowing time-to-market. Branded wholesalers and distributors operated under disconnected procurement tools, creating manual friction that threatened billions in annual commerce.
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        The mandate wasn't merely a UI refresh. It was a comprehensive re-engineering of global commerce operations: standardizing complex regional tax jurisdictions, right-to-left localization, and order approval workflows into a single responsive digital platform.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div class="glass-card rounded-2xl p-5">
+                            <h4 class="text-sm font-bold text-white mb-2">Cross-Border Compliance</h4>
+                            <p class="text-xs text-gray-400">Navigated dynamic tax laws and localized customs protocols across 25 languages, ensuring 100% adherence to international fuel distribution standards.</p>
+                        </div>
+                        <div class="glass-card rounded-2xl p-5">
+                            <h4 class="text-sm font-bold text-white mb-2">Risk Safeguards</h4>
+                            <p class="text-xs text-gray-400">Engineered context-aware validation gates preventing multi-million dollar volume mismatches and inventory routing errors before order confirmation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="glass-card rounded-3xl p-3 overflow-hidden border border-white/10">
+                        <img src="resource/images/oil-gas/screen-new.jpg" alt="ExxonMobil Platform UI Screen" 
+                             class="w-full rounded-2xl object-cover cursor-zoom-in interactive"
+                             onclick="openLightbox(this.src)">
+                        <p class="text-[11px] font-mono text-gray-400 text-center py-2">Operational Command Center Interface</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Rules Engine & Complexity -->
+        <section id="rules-engine" class="px-6 max-w-7xl mx-auto py-20">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// SYSTEMS DESIGN</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">The Rules Engine: Automating High-Value Logic</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">
+                    At the heart of the platform was a rigorous back-office rules engine that transformed manual multi-stage approval processes into a continuous, real-time experience.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16 reveal-on-scroll">
+                <div class="glass-card rounded-3xl p-8 border-l-4 border-l-brand-cyan">
+                    <div class="w-10 h-10 rounded-xl bg-brand-cyan/10 text-brand-cyan flex items-center justify-center mb-6">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">High-Density Command Center</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Consolidated 15+ disparate ERP and logistics data feeds into a unified console for regional order analysts, cutting cognitive overload by over 50%.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8 border-l-4 border-l-blue-500">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-6">
+                        <i data-lucide="user-check" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Automated Self-Service</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Empowered international distributors to manage billion-dollar wholesale contracts, contract balances, and carrier nominations autonomously.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8 border-l-4 border-l-emerald-500">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-6">
+                        <i data-lucide="globe" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Localization & RTL Architecture</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Built dynamic layout primitives that mirrored interfaces seamlessly for right-to-left scripts (Arabic, Hebrew) while maintaining component fidelity.</p>
+                </div>
+            </div>
+
+            <!-- Architecture & Journey Blueprint -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 reveal-on-scroll">
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-2">User Journey & Process Orchestration</h4>
+                        <p class="text-xs text-gray-400 mb-4">Mapping buyer, distributor, and compliance manager touchpoints across order stages.</p>
+                    </div>
+                    <div class="h-64 sm:h-72 md:h-80 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/60 flex items-center justify-center p-2">
+                        <img src="resource/images/oil-gas/user-journey1.jpg" alt="User Journey Map" class="max-h-full max-w-full object-contain cursor-zoom-in interactive hover:scale-[1.02] transition-transform" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-2">Global Information Architecture</h4>
+                        <p class="text-xs text-gray-400 mb-4">Modular taxonomy accommodating varying regional product catalogues and tax guidelines.</p>
+                    </div>
+                    <div class="h-64 sm:h-72 md:h-80 w-full rounded-2xl overflow-hidden border border-white/10 bg-black/60 flex items-center justify-center p-2">
+                        <img src="resource/images/oil-gas/information-architecture.jpg" alt="Information Architecture" class="max-h-full max-w-full object-contain cursor-zoom-in interactive hover:scale-[1.02] transition-transform" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leadership & Governance -->
+        <section id="governance" class="px-6 max-w-7xl mx-auto py-16 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// CROSS-FUNCTIONAL LEADERSHIP</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">Establishing Global Design Governance</h2>
+                <p class="text-gray-400 text-sm sm:text-base mt-4">
+                    Directing a team of 15+ product designers and researchers across international hubs. Aligned Deloitte engineering and ExxonMobil product leadership through a unified design system.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal-on-scroll">
+                <div class="glass-card rounded-3xl p-8">
+                    <div class="text-2xl font-bold font-mono text-brand-cyan mb-2">WCAG 2.1 AAA</div>
+                    <h4 class="text-base font-bold text-white mb-2">Inclusive Compliance</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Mandated accessibility standards from day one, ensuring the platform met global compliance across touch devices and desktop consoles.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8">
+                    <div class="text-2xl font-bold font-mono text-brand-cyan mb-2">-30% Debt</div>
+                    <h4 class="text-base font-bold text-white mb-2">Handoff Efficiency</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Bridged design to front-end development using tokenized specs, eliminating 30% of engineering rework cycles during sprint delivery.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8">
+                    <div class="text-2xl font-bold font-mono text-brand-cyan mb-2">Omnichannel</div>
+                    <h4 class="text-base font-bold text-white mb-2">Responsive Parity</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Designed unified experiences scaling from mobile phones on refinery docks to triple-monitor trading desk arrays.</p>
+                </div>
+            </div>
+
+            <!-- Wireframes & Styleguide Gallery -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal-on-scroll">
+                <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+                    <span class="text-[11px] font-mono text-brand-cyan block mb-2">WIREFRAMES & TESTING</span>
+                    <div class="h-52 sm:h-60 w-full rounded-xl overflow-hidden bg-black/60 border border-white/5 flex items-center justify-center">
+                        <img src="resource/images/oil-gas/wireframes.png" alt="Axure Wireframes" class="w-full h-full object-cover cursor-zoom-in interactive hover:scale-105 transition-transform" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+                    <span class="text-[11px] font-mono text-brand-cyan block mb-2">RESPONSIVE ADAPTABILITY</span>
+                    <div class="h-52 sm:h-60 w-full rounded-xl overflow-hidden bg-black/60 border border-white/5 flex items-center justify-center">
+                        <img src="resource/images/oil-gas/responsive1.jpg" alt="Responsive Breakpoints" class="w-full h-full object-cover cursor-zoom-in interactive hover:scale-105 transition-transform" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 flex flex-col justify-between">
+                    <span class="text-[11px] font-mono text-brand-cyan block mb-2">DESIGN SYSTEM TOKENS</span>
+                    <div class="h-52 sm:h-60 w-full rounded-xl overflow-hidden bg-black/60 border border-white/5 flex items-center justify-center">
+                        <img src="resource/images/oil-gas/style-guide1.jpg" alt="Style Guide" class="w-full h-full object-cover object-top cursor-zoom-in interactive hover:scale-105 transition-transform" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Screens & Deep Dive -->
+        <section id="screens" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// PRODUCTION OUTPUT</span>
+                <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">The Deployed Platform</h2>
+            </div>
+
+            <div class="space-y-12 reveal-on-scroll">
+                <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl">
+                    <img src="resource/images/oil-gas/screen1.jpg" alt="Platform Order Management Screen" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                </div>
+
+                <div class="glass-panel rounded-3xl p-3 border border-white/10 shadow-2xl">
+                    <img src="resource/images/oil-gas/screen2.jpg" alt="Platform Analytical Dashboard" class="w-full rounded-2xl cursor-zoom-in interactive" onclick="openLightbox(this.src)">
+                </div>
+            </div>
+        </section>
+
+        <!-- Measurable ROI Section -->
+        <section id="roi" class="px-6 max-w-7xl mx-auto py-20 border-t border-white/10">
+            <div class="reveal-on-scroll">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs font-mono text-brand-cyan uppercase tracking-widest block mb-2">// MEASURABLE SUCCESS</span>
+                    <h2 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">Delivering Commercial ROI</h2>
+                    <p class="text-gray-400 text-sm sm:text-base mt-4">By shifting from isolated screens to systemic workflow scalability, the commerce infrastructure established a new global operational benchmark for ExxonMobil.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                    <div class="glass-card rounded-3xl p-10">
+                        <div class="text-5xl font-bold font-mono text-brand-cyan mb-2">22%</div>
+                        <h4 class="text-xl font-bold text-white mb-2">Digital Acquisition Lift</h4>
+                        <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">Directly attributable to intuitive digital onboarding and unified multi-lingual self-service capabilities.</p>
+                    </div>
+
+                    <div class="glass-card rounded-3xl p-10">
+                        <div class="text-5xl font-bold font-mono text-brand-cyan mb-2">40%</div>
+                        <h4 class="text-xl font-bold text-white mb-2">Operational Cost Savings</h4>
+                        <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">Reduced back-office latency and human error rates through automated validation and real-time ERP sync.</p>
+                    </div>
+                </div>
+
+                <!-- Next Project Bottom Pager -->
+                <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                        <span class="text-xs font-mono text-gray-400 uppercase tracking-widest block mb-1">Next Case Study</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">Tata Pay &middot; UPI Payments Ecosystem</h3>
+                        <p class="text-xs text-gray-400 mt-1">Tata Neu &middot; FinTech Architecture &middot; +40% Adoption</p>
+                    </div>
+                    <a href="case-study-tata-pay.html" class="bg-brand-cyan hover:bg-[#5935E8] text-white hover:text-white font-bold px-8 py-4 rounded-full transition-all flex items-center gap-3 text-sm font-mono tracking-wider interactive">
+                        <span>Read Next Case Study</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-white/10 text-center text-xs font-mono text-gray-500">
+        <p>&copy; 2024-2026 Rupak Biswas &middot; Senior Designer &middot; All Rights Reserved.</p>
+    </footer>
+
+    <!-- Lightbox Modal for Fullscreen Image View -->
+    <div id="lightbox-modal" class="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-gray-400 hover:text-white p-2 rounded-full bg-white/10 interactive">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl border border-white/10">
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        window.addEventListener('mousemove', (e) => {
+            cursorDot.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
+            
+            cursorGlow.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 250, fill: 'forwards' });
+        });
+
+        document.querySelectorAll('.interactive, a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+
+    <!-- ==========================================================================
+       INTERACTIVE AVATAR CONCIERGE & PORTFOLIO GUIDE (Case Study UX Walkthrough)
+       ========================================================================== -->
+    <div id="portfolio-guide-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-auto">
+        
+        <!-- Guide Dialogue / Routing Popover (Expandable) -->
+        <div id="guide-popover" onclick="event.stopPropagation()" class="w-80 sm:w-96 rounded-3xl border p-5 shadow-2xl mb-3 transition-all duration-300 transform origin-bottom-right scale-95 opacity-0 pointer-events-none backdrop-blur-2xl">
+            <!-- Popover Header -->
+            <div class="flex items-center justify-between pb-3 border-b guide-divider">
+                <div class="flex items-center gap-2.5">
+                    <div class="guide-headshot-frame w-8 h-8 rounded-full overflow-hidden border shadow-sm">
+                        <img src="Avatar-headshot.png" alt="Rupak Avatar" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='resource/images/rupak_avatar_headshot.png';">
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold flex items-center gap-1.5 guide-title">
+                            Rupak Biswas
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </h4>
+                        <span class="text-[10px] font-mono guide-subtitle">UX Guide & Concierge</span>
+                    </div>
+                </div>
+                <button type="button" onclick="closeGuidePopover(event)" class="guide-close-btn p-1.5 rounded-lg transition-colors interactive" title="Close Guide" aria-label="Close Guide">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Dynamic Guide Message & Screen-by-Screen Walkthrough -->
+            <div class="py-3.5">
+                <div class="p-3 rounded-2xl border guide-bubble-box">
+                    <p id="guide-speech-bubble" class="text-xs leading-relaxed">
+                        Welcome! Would you like me to walk you through this case study screen by screen like a Senior UX Director?
+                    </p>
+                </div>
+                <div id="guide-walkthrough-controls" class="mt-2">
+                    <button type="button" onclick="triggerGeminiScreenWalkthrough(event)" class="w-full py-2 px-3 rounded-xl guide-btn-primary font-bold text-xs font-mono transition-all flex items-center justify-center gap-1.5 shadow-sm interactive">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Start Screen-by-Screen Walkthrough</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fast Navigation Routes -->
+            <div class="space-y-1.5 pt-2 border-t guide-divider">
+                <span class="text-[9px] font-mono uppercase tracking-wider guide-section-label block px-1">Explore Other Blueprints</span>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <a href="case-study-corporate-banking.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">💳 Banking</a>
+                    <a href="case-study-oil-gas.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">⛽ Energy OS</a>
+                    <a href="case-study-tata-pay.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">📱 Tata Pay</a>
+                    <a href="case-study-couchbase-day-0.html" class="guide-route-link p-1.5 rounded-lg border text-[10px] block truncate">☁️ Couchbase</a>
+                </div>
+                <div class="pt-2">
+                    <a href="index.html" class="guide-btn-secondary w-full py-1.5 px-3 rounded-lg border text-[10px] font-mono transition-all text-center block interactive">
+                        &larr; Return to Executive Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Avatar Button Trigger -->
+        <button id="guide-avatar-trigger" type="button" aria-label="Toggle Ask Guide & Explore" class="relative group cursor-pointer block border-0 bg-transparent p-0 text-left outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan interactive" onclick="toggleGuidePopover(null, event)">
+            <div class="absolute -inset-2 rounded-full pulse-ring pointer-events-none"></div>
+            <div id="guide-badge-hint" class="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl hidden sm:flex items-center gap-2 group-hover:scale-105 transition-all pointer-events-none">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span>Explain Screens</span>
+            </div>
+            <div class="avatar-float relative w-16 h-16 sm:w-20 sm:h-20 guide-avatar-frame rounded-2xl p-1 border-2 transition-all overflow-hidden interactive">
+                <img src="Avatar.png" alt="Rupak Biswas - Guide Avatar" class="w-full h-full object-contain object-top transform group-hover:scale-105 transition-transform duration-300 pointer-events-none" onerror="this.onerror=null; this.src='resource/images/Avatar.png';">
+                <span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full guide-avatar-status-dot border-2 shadow-sm pointer-events-none"></span>
+            </div>
+        </button>
+    </div>
+
+
+    <!-- Guide Controller managed in avatar-guide.js (persists open until Close CTA is clicked) -->
+    <script src="avatar-guide.js?v=2.3.0"></script>
+
+</body>
+</html>
